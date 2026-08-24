@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>SHO Management Panel | Seva360</title>
+
+    <style>
+        * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: Arial, sans-serif;
+}
+
+body {
+    height: 100vh;
+    overflow: hidden; /* body scroll band */
+}
+
+/* Main container */
+.dashboard-container {
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+/* NOTICE BOARD */
+.notice-board {
+    height: 50vh;              /* 🔥 half screen */
+    background: #0f2a44;
+    color: #fff;
+    padding: 15px;
+    border-bottom: 3px solid #1e90ff;
+}
+
+.notice-board h2 {
+    text-align: center;
+    margin-bottom: 10px;
+}
+
+.notice-content {
+    font-size: 16px;
+    line-height: 1.8;
+}
+
+/* ICON SECTION */
+.icon-section {
+    height: 50vh;              /* remaining half */
+    overflow-y: auto;          /* 🔥 scroll yahin */
+    padding: 15px;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 15px;
+    background: #f2f2f2;
+}
+
+/* ICON CARD */
+.icon-card {
+    background: white;
+    border-radius: 12px;
+    height: 90px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    font-size: 26px;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.icon-card span {
+    font-size: 14px;
+    margin-top: 5px;
+}
+
+.icon-card:hover {
+    transform: scale(1.08);
+    background: #e6f2ff;
+}
+
+
+        </style>
+</head>
+
+<body>
+
+<div class="dashboard-container">
+
+    <!-- NOTICE BOARD -->
+    <div class="notice-board">
+        <h2>📢 Notice Board</h2>
+
+        <div class="notice-content">
+            <p>• Duty chart updated</p>
+            <p>• New deployment order</p>
+            <p>• Leave approval process changed</p>
+            <p>• Emergency alert guidelines</p>
+        </div>
+    </div>
+
+    <!-- ICON SECTION -->
+    <div class="icon-section">
+
+        <div class="icon-card" id="pendingBtn">⏳<span>Pending</span></div>
+        <div class="icon-card" id="contactBtn">📞<span>Contact</span></div>
+        <div class="icon-card" id="deploymentBtn">🚓<span>Deployment</span></div>
+        <div class="icon-card" id="permissionBtn">📝<span>Permission</span></div>
+        <div class="icon-card" id="searchBtn">🔍<span>Search</span></div>
+        <div class="icon-card" id="Duty_chartBtn">📊<span>Duty_Chart</span></div>
+        <div class="icon-card" id="sho_LeaveBtn">🏖️<span>Leave</span></div>
+        <div class="icon-card" id="sho_Hcm_Alert&MsgBtn">🚨<span>Alert&Msg</span></div>
+        <div class="icon-card" id="profileBtn">👤<span>Profile</span></div>
+
+    </div>
+
+</div>
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+    console.log("✅ JS loaded");
+    document.getElementById("pendingBtn")
+        ?.addEventListener("click", () => {
+            window.location.href = "/pending.html";
+        });
+
+    document.getElementById("contactBtn")
+        ?.addEventListener("click", () => {
+            window.location.href = "/contact.html";
+        });
+
+    document.getElementById("deploymentBtn")
+        ?.addEventListener("click", () => {
+            window.location.href = "/deployment.html";
+        });
+
+    document.getElementById("permissionBtn")
+        ?.addEventListener("click", () => {
+            window.location.href = "/permission.html";
+        });
+
+    document.getElementById("searchBtn")
+        ?.addEventListener("click", () => {
+            window.location.href = "/search.html";
+        });
+
+    document.getElementById("Duty_chartBtn")
+        ?.addEventListener("click", () => {
+            window.location.href = "/Duty_chart.html";
+        });
+
+    document.getElementById("sho_LeaveBtn")
+        ?.addEventListener("click", () => {
+            window.location.href = "/sho_Leave.html";
+        });
+
+    document.getElementById("sho_Hcm_Alert&MsgBtn")
+        ?.addEventListener("click", () => {
+            window.location.href = "/sho_Hcm_Alert&Msg.html";
+        });
+
+    document.getElementById("profileBtn")
+        ?.addEventListener("click", () => {
+            window.location.href = "/profile.html";
+        });
+
+});
+</script>
+
+</body>
+</html>

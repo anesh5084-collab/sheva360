@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Map Permission Control</title>
+</head>
+<body>
+
+  <h2>Admin – User Permission Control</h2>
+
+  <div id="userList">Loading users...</div>
+
+  <script>
+    fetch("/admin/users")
+      .then(res => res.json())
+      .then(users => {
+        const div = document.getElementById("userList");
+        div.innerHTML = "";
+
+        if (users.length === 0) {
+          div.innerHTML = "<p>No users found</p>";
+          return;
+        }
+
+        users.forEach(user => {
+          div.innerHTML += `
+            <p>
+              <b>${user.username}</b>
+              <input type="checkbox"
+                ${user.allowedForMap ? "checked" : ""}
+                onchange="toggleUser('${user._id}', this.checked)">
+            </p>
+          `;
+        });
+      })
+      .catch(err => {
+        document.getElementById("userList").innerText = "Error loading users";
+        console.error(err);
+      });
+
+    function toggleUser(id, allowed) {
+      fetch("/admin/toggle-user", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ userId: id, allowed })
+      });
+    }
+  </script>
+
+</body>
+</html>

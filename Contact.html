@@ -1,0 +1,623 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Seva360 - Contacts</title>
+<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;600;700&family=Noto+Sans+Devanagari:wght@400;600&display=swap" rel="stylesheet"/>
+<style>
+  :root {
+    --navy: #0a1628;
+    --blue: #1a3a6b;
+    --accent: #e8a020;
+    --accent2: #3b82f6;
+    --light: #f0f4ff;
+    --card: #ffffff;
+    --border: #dde3f0;
+    --text: #1e2d4a;
+    --muted: #6b7a99;
+    --green: #16a34a;
+    --red: #dc2626;
+    --pending: #f59e0b;
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { font-family:'Rajdhani',sans-serif; background:var(--light); color:var(--text); min-height:100vh; }
+
+  /* HEADER */
+  .header {
+    background: linear-gradient(135deg, var(--navy) 0%, var(--blue) 100%);
+    padding: 16px 24px;
+    display: flex; align-items:center; justify-content:space-between;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+    position: sticky; top:0; z-index:100;
+  }
+  .header-left { display:flex; align-items:center; gap:12px; }
+  .badge { background:var(--accent); color:var(--navy); font-weight:700; font-size:11px; padding:3px 8px; border-radius:4px; letter-spacing:1px; }
+  .header h1 { color:#fff; font-size:22px; font-weight:700; letter-spacing:1px; }
+  .header-right { display:flex; gap:10px; align-items:center; }
+  .btn { padding:8px 16px; border:none; border-radius:6px; font-family:'Rajdhani',sans-serif; font-weight:600; font-size:14px; cursor:pointer; transition:all 0.2s; }
+  .btn-accent { background:var(--accent); color:var(--navy); }
+  .btn-accent:hover { background:#f5b840; transform:translateY(-1px); }
+  .btn-outline { background:transparent; color:#fff; border:1.5px solid rgba(255,255,255,0.4); }
+  .btn-outline:hover { background:rgba(255,255,255,0.1); }
+
+  /* FILTER BAR */
+  .filter-bar {
+    background:#fff;
+    border-bottom: 2px solid var(--border);
+    padding: 14px 24px;
+    display:flex; gap:12px; flex-wrap:wrap; align-items:center;
+  }
+  .filter-bar select, .filter-bar input {
+    padding: 8px 12px;
+    border: 1.5px solid var(--border);
+    border-radius: 6px;
+    font-family:'Rajdhani',sans-serif;
+    font-size:14px;
+    color:var(--text);
+    background:#fff;
+    min-width:160px;
+  }
+  .filter-bar select:focus, .filter-bar input:focus { outline:none; border-color:var(--accent2); }
+  .btn-filter { background:var(--navy); color:#fff; }
+  .btn-filter:hover { background:var(--blue); }
+  .btn-reset { background:var(--border); color:var(--text); }
+
+  /* MAIN */
+  .main { padding:24px; max-width:1200px; margin:0 auto; }
+
+  /* TABS */
+  .tabs { display:flex; gap:4px; margin-bottom:20px; background:#fff; padding:6px; border-radius:10px; border:1.5px solid var(--border); width:fit-content; }
+  .tab { padding:8px 20px; border-radius:7px; border:none; font-family:'Rajdhani',sans-serif; font-weight:600; font-size:14px; cursor:pointer; transition:all 0.2s; background:transparent; color:var(--muted); }
+  .tab.active { background:var(--navy); color:#fff; }
+  .tab .count { background:var(--accent); color:var(--navy); font-size:11px; padding:1px 6px; border-radius:10px; margin-left:6px; }
+
+  /* CONTACT GRID */
+  .contact-grid { display:grid; grid-template-columns:repeat(auto-fill, minmax(300px,1fr)); gap:16px; }
+
+  .contact-card {
+    background:#fff;
+    border-radius:12px;
+    border:1.5px solid var(--border);
+    overflow:hidden;
+    transition:all 0.2s;
+    animation: fadeUp 0.3s ease forwards;
+    opacity:0;
+  }
+  .contact-card:hover { transform:translateY(-3px); box-shadow:0 8px 30px rgba(0,0,0,0.1); border-color:var(--accent2); }
+  @keyframes fadeUp { from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:translateY(0)} }
+
+  .card-header {
+    background: linear-gradient(135deg, var(--navy), var(--blue));
+    padding:14px 16px;
+    display:flex; justify-content:space-between; align-items:flex-start;
+  }
+  .card-name { color:#fff; font-size:17px; font-weight:700; }
+  .card-desig { color:rgba(255,255,255,0.7); font-size:13px; margin-top:2px; }
+  .card-batch { background:var(--accent); color:var(--navy); font-size:11px; font-weight:700; padding:3px 8px; border-radius:4px; white-space:nowrap; }
+
+  .card-body { padding:14px 16px; }
+  .card-info { display:flex; flex-direction:column; gap:6px; margin-bottom:14px; }
+  .info-row { display:flex; align-items:center; gap:8px; font-size:13px; color:var(--muted); }
+  .info-row span { color:var(--text); font-weight:600; }
+  .info-icon { font-size:14px; }
+
+  .card-actions { display:flex; gap:8px; }
+  .btn-call { background:#16a34a; color:#fff; flex:1; display:flex; align-items:center; justify-content:center; gap:6px; padding:9px; border-radius:7px; border:none; font-family:'Rajdhani',sans-serif; font-weight:600; font-size:13px; cursor:pointer; transition:all 0.2s; }
+  .btn-call:hover { background:#15803d; }
+  .btn-sms { background:var(--accent2); color:#fff; flex:1; display:flex; align-items:center; justify-content:center; gap:6px; padding:9px; border-radius:7px; border:none; font-family:'Rajdhani',sans-serif; font-weight:600; font-size:13px; cursor:pointer; transition:all 0.2s; }
+  .btn-sms:hover { background:#2563eb; }
+  .btn-wa { background:#25D366; color:#fff; flex:1; display:flex; align-items:center; justify-content:center; gap:6px; padding:9px; border-radius:7px; border:none; font-family:'Rajdhani',sans-serif; font-weight:600; font-size:13px; cursor:pointer; transition:all 0.2s; }
+  .btn-wa:hover { background:#128C7E; }
+
+  /* PENDING CARD */
+  .pending-card {
+    background:#fff;
+    border-radius:12px;
+    border:1.5px solid var(--pending);
+    padding:16px;
+    display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px;
+    animation: fadeUp 0.3s ease forwards; opacity:0;
+  }
+  .pending-info { flex:1; }
+  .pending-name { font-size:16px; font-weight:700; color:var(--text); }
+  .pending-meta { font-size:13px; color:var(--muted); margin-top:4px; }
+  .pending-badge { background:#fef3c7; color:#92400e; font-size:11px; font-weight:700; padding:3px 8px; border-radius:4px; }
+  .pending-actions { display:flex; gap:8px; }
+  .btn-approve { background:var(--green); color:#fff; padding:8px 16px; border-radius:6px; border:none; font-family:'Rajdhani',sans-serif; font-weight:600; font-size:13px; cursor:pointer; }
+  .btn-approve:hover { background:#15803d; }
+  .btn-reject { background:var(--red); color:#fff; padding:8px 16px; border-radius:6px; border:none; font-family:'Rajdhani',sans-serif; font-weight:600; font-size:13px; cursor:pointer; }
+  .btn-reject:hover { background:#b91c1c; }
+
+  /* EMPTY STATE */
+  .empty { text-align:center; padding:60px 20px; color:var(--muted); }
+  .empty-icon { font-size:48px; margin-bottom:12px; }
+  .empty h3 { font-size:18px; margin-bottom:6px; color:var(--text); }
+
+  /* MODAL */
+  .modal-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5); z-index:200; align-items:center; justify-content:center; }
+  .modal-overlay.open { display:flex; }
+  .modal { background:#fff; border-radius:16px; padding:28px; width:90%; max-width:500px; max-height:90vh; overflow-y:auto; animation:modalIn 0.3s ease; }
+  @keyframes modalIn { from{opacity:0;transform:scale(0.9)} to{opacity:1;transform:scale(1)} }
+  .modal h2 { font-size:20px; font-weight:700; color:var(--navy); margin-bottom:20px; padding-bottom:12px; border-bottom:2px solid var(--border); }
+  .form-row { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+  .form-group { margin-bottom:14px; }
+  .form-group label { display:block; font-size:13px; font-weight:600; color:var(--muted); margin-bottom:5px; }
+  .form-group input, .form-group select {
+    width:100%; padding:10px 12px;
+    border:1.5px solid var(--border); border-radius:7px;
+    font-family:'Rajdhani',sans-serif; font-size:14px; color:var(--text);
+  }
+  .form-group input:focus, .form-group select:focus { outline:none; border-color:var(--accent2); }
+  .modal-footer { display:flex; gap:10px; justify-content:flex-end; margin-top:20px; }
+  .btn-cancel { background:var(--border); color:var(--text); padding:10px 20px; }
+  .btn-submit { background:var(--navy); color:#fff; padding:10px 24px; }
+  .btn-submit:hover { background:var(--blue); }
+
+  /* TOAST */
+  .toast { position:fixed; bottom:24px; right:24px; background:var(--navy); color:#fff; padding:12px 20px; border-radius:8px; font-size:14px; font-weight:600; z-index:999; transform:translateY(100px); opacity:0; transition:all 0.3s; }
+  .toast.show { transform:translateY(0); opacity:1; }
+  .toast.success { border-left:4px solid var(--green); }
+  .toast.error { border-left:4px solid var(--red); }
+
+  .loading { text-align:center; padding:40px; color:var(--muted); font-size:16px; }
+
+  @media(max-width:600px) {
+    .filter-bar { flex-direction:column; }
+    .filter-bar select, .filter-bar input { min-width:100%; }
+    .form-row { grid-template-columns:1fr; }
+    .header h1 { font-size:17px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="header">
+  <div class="header-left">
+    <div class="badge">SEVA360</div>
+    <h1>📋 Contact Directory</h1>
+  </div>
+  <div class="header-right">
+    <button class="btn btn-accent" id="addBtn" style="display:none;" onclick="openModal()">+ Add Contact</button>
+    <button class="btn btn-outline" onclick="window.history.back()">← Back</button>
+  </div>
+</div>
+
+<!-- FILTER BAR -->
+<div class="filter-bar">
+  <select id="filterState" onchange="onStateChange()">
+    <option value="">🗺️ सभी State</option>
+  </select>
+  <select id="filterDistrict" onchange="onDistrictChange()">
+    <option value="">🏙️ सभी District</option>
+  </select>
+  <select id="filterPS">
+    <option value="">🏛️ सभी Police Station</option>
+  </select>
+  <button class="btn btn-filter" onclick="loadContacts()">🔍 Filter</button>
+  <button class="btn btn-reset" onclick="resetFilters()">↺ Reset</button>
+</div>
+
+<!-- MAIN -->
+<div class="main">
+
+  <!-- TABS (admin only) -->
+  <div class="tabs" id="tabsSection" style="display:none;">
+    <button class="tab active" onclick="switchTab('contacts')" id="tab-contacts">
+      📋 Contacts <span class="count" id="contactCount">0</span>
+    </button>
+    <button class="tab" onclick="switchTab('pending')" id="tab-pending">
+      ⏳ Pending Requests <span class="count" id="pendingCount">0</span>
+    </button>
+  </div>
+
+  <!-- CONTACTS -->
+  <div id="contactsSection">
+    <div class="contact-grid" id="contactGrid">
+      <div class="loading">⏳ Loading...</div>
+    </div>
+  </div>
+
+  <!-- PENDING (admin) -->
+  <div id="pendingSection" style="display:none;">
+    <div style="display:flex; flex-direction:column; gap:12px;" id="pendingList">
+      <div class="loading">⏳ Loading...</div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ADD CONTACT MODAL -->
+<div class="modal-overlay" id="modalOverlay">
+  <div class="modal">
+    <h2 id="modalTitle">📝 Contact Add करो</h2>
+    <input type="hidden" id="editId"/>
+    <div class="form-row">
+      <div class="form-group">
+        <label>State *</label>
+        <select id="mState" onchange="onModalStateChange()">
+          <option value="">-- State Select करो --</option>
+          <option value="Madhya Pradesh">Madhya Pradesh</option>
+          <option value="Uttar Pradesh">Uttar Pradesh</option>
+          <option value="Rajasthan">Rajasthan</option>
+          <option value="Maharashtra">Maharashtra</option>
+          <option value="Gujarat">Gujarat</option>
+          <option value="Chhattisgarh">Chhattisgarh</option>
+          <option value="Bihar">Bihar</option>
+          <option value="Delhi">Delhi</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>District *</label>
+        <select id="mDistrict" onchange="onModalDistrictChange()">
+          <option value="">-- पहले State चुनो --</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-group">
+      <label>Police Station *</label>
+      <select id="mPS">
+        <option value="">-- पहले District चुनो --</option>
+      </select>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>Name *</label>
+        <input type="text" id="mName" placeholder="पूरा नाम"/>
+      </div>
+      <div class="form-group">
+        <label>Designation *</label>
+        <input type="text" id="mDesig" placeholder="जैसे: Inspector"/>
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>Batch Number (Optional)</label>
+        <input type="text" id="mBatch" placeholder="Batch No. (जरूरी नहीं)"/>
+      </div>
+      <div class="form-group">
+        <label>Mobile Number *</label>
+        <input type="tel" id="mMobile" placeholder="10 digit"/>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-cancel" onclick="closeModal()">Cancel</button>
+      <button class="btn btn-submit" id="submitBtn" onclick="submitRequest()">💾 Save करो</button>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<script>
+let currentUser = null;
+let allContacts = [];
+
+// Init
+async function init() {
+  try {
+    const res = await fetch("/api/me");
+    currentUser = await res.json();
+
+    // Admin को tabs और Add button दिखाओ
+    if (currentUser.role === "admin") {
+      document.getElementById("tabsSection").style.display = "flex";
+      document.getElementById("addBtn").style.display = "inline-block";
+      loadPending();
+    } else {
+      document.getElementById("addBtn").style.display = "inline-block";
+      document.getElementById("addBtn").textContent = "📤 Request भेजो";
+    }
+
+    await loadContacts();
+    buildFilterOptions();
+  } catch(e) {
+    window.location.href = "/login.html";
+  }
+}
+
+// Contacts Load
+async function loadContacts() {
+  const state = document.getElementById("filterState").value;
+  const district = document.getElementById("filterDistrict").value;
+  const ps = document.getElementById("filterPS").value;
+
+  let url = "/api/contacts?";
+  if (state) url += `state=${encodeURIComponent(state)}&`;
+  if (district) url += `district=${encodeURIComponent(district)}&`;
+  if (ps) url += `policeStation=${encodeURIComponent(ps)}&`;
+
+  const res = await fetch(url);
+  allContacts = await res.json();
+
+  document.getElementById("contactCount").textContent = allContacts.length;
+  renderContacts(allContacts);
+  buildFilterOptions();
+}
+
+function renderContacts(contacts) {
+  const grid = document.getElementById("contactGrid");
+  if (!contacts.length) {
+    grid.innerHTML = `<div class="empty" style="grid-column:1/-1"><div class="empty-icon">📭</div><h3>कोई Contact नहीं मिला</h3><p>Filter बदलो या नया contact add करो</p></div>`;
+    return;
+  }
+  grid.innerHTML = contacts.map((c, i) => `
+    <div class="contact-card" style="animation-delay:${i*0.05}s">
+      <div class="card-header">
+        <div>
+          <div class="card-name">${c.name}</div>
+          <div class="card-desig">${c.designation}</div>
+        </div>
+        <div class="card-batch">#${c.batchNumber}</div>
+      </div>
+      <div class="card-body">
+        <div class="card-info">
+          <div class="info-row"><span class="info-icon">🏛️</span> <span>${c.policeStation}</span></div>
+          <div class="info-row"><span class="info-icon">🏙️</span> ${c.district}, ${c.state}</div>
+          <div class="info-row"><span class="info-icon">📱</span> <span>${c.mobile}</span></div>
+        </div>
+        <div class="card-actions">
+          <button class="btn-call" onclick="callContact('${c.mobile}')">📞 Call</button>
+          <button class="btn-sms" onclick="smsContact('${c.mobile}')">💬 SMS</button>
+          <button class="btn-wa" onclick="whatsappContact('${c.mobile}')">WhatsApp</button>
+        </div>
+        ${currentUser && currentUser.role === 'admin' ? `
+        <div style="margin-top:8px;display:flex;gap:6px;">
+          <button class="btn-sms" style="flex:1;" onclick="editContact('${c._id}','${c.name}','${c.designation}','${c.batchNumber}','${c.mobile}','${c.state}','${c.district}','${c.policeStation}')">✏️ Edit</button>
+          <button class="btn btn-reject" style="flex:1;padding:9px;" onclick="deleteContact('${c._id}')">🗑️ Delete</button>
+        </div>` : ''}
+      </div>
+    </div>
+  `).join('');
+}
+
+// Pending Load (Admin)
+async function loadPending() {
+  const res = await fetch("/api/admin/contact-requests");
+  const pending = await res.json();
+  document.getElementById("pendingCount").textContent = pending.length;
+
+  const list = document.getElementById("pendingList");
+  if (!pending.length) {
+    list.innerHTML = `<div class="empty"><div class="empty-icon">✅</div><h3>कोई Pending Request नहीं</h3></div>`;
+    return;
+  }
+  list.innerHTML = pending.map((c, i) => `
+    <div class="pending-card" style="animation-delay:${i*0.05}s">
+      <div class="pending-info">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:4px;">
+          <div class="pending-name">${c.name}</div>
+          <span class="pending-badge">⏳ Pending</span>
+        </div>
+        <div class="pending-meta">${c.designation} | #${c.batchNumber} | ${c.policeStation}, ${c.district}, ${c.state}</div>
+        <div class="pending-meta">📱 ${c.mobile} | Added by: ${c.addedBy}</div>
+      </div>
+      <div class="pending-actions">
+        <button class="btn-approve" onclick="approveContact('${c._id}')">✅ Approve</button>
+        <button class="btn-reject" onclick="deleteContact('${c._id}')">❌ Reject</button>
+      </div>
+    </div>
+  `).join('');
+}
+
+// Filter Options Build
+function buildFilterOptions() {
+  const states = [...new Set(allContacts.map(c => c.state))].sort();
+  const stateEl = document.getElementById("filterState");
+  const curState = stateEl.value;
+  stateEl.innerHTML = '<option value="">🗺️ सभी State</option>' + states.map(s => `<option value="${s}" ${s===curState?'selected':''}>${s}</option>`).join('');
+
+  updateDistrictOptions();
+}
+
+function onStateChange() {
+  updateDistrictOptions();
+  document.getElementById("filterPS").innerHTML = '<option value="">🏛️ सभी Police Station</option>';
+}
+
+function updateDistrictOptions() {
+  const state = document.getElementById("filterState").value;
+  const filtered = state ? allContacts.filter(c => c.state === state) : allContacts;
+  const districts = [...new Set(filtered.map(c => c.district))].sort();
+  const distEl = document.getElementById("filterDistrict");
+  const cur = distEl.value;
+  distEl.innerHTML = '<option value="">🏙️ सभी District</option>' + districts.map(d => `<option value="${d}" ${d===cur?'selected':''}>${d}</option>`).join('');
+  updatePSOptions();
+}
+
+function onDistrictChange() { updatePSOptions(); }
+
+function updatePSOptions() {
+  const state = document.getElementById("filterState").value;
+  const district = document.getElementById("filterDistrict").value;
+  let filtered = allContacts;
+  if (state) filtered = filtered.filter(c => c.state === state);
+  if (district) filtered = filtered.filter(c => c.district === district);
+  const stations = [...new Set(filtered.map(c => c.policeStation))].sort();
+  const psEl = document.getElementById("filterPS");
+  const cur = psEl.value;
+  psEl.innerHTML = '<option value="">🏛️ सभी Police Station</option>' + stations.map(s => `<option value="${s}" ${s===cur?'selected':''}>${s}</option>`).join('');
+}
+
+function resetFilters() {
+  document.getElementById("filterState").value = "";
+  document.getElementById("filterDistrict").value = "";
+  document.getElementById("filterPS").value = "";
+  loadContacts();
+}
+
+// Actions
+function callContact(mobile) { window.location.href = `tel:${mobile}`; }
+function smsContact(mobile) { window.location.href = `sms:${mobile}`; }
+function whatsappContact(mobile) { window.open(`https://wa.me/91${mobile}`, '_blank'); }
+
+async function approveContact(id) {
+  await fetch(`/api/admin/contact-approve/${id}`, { method:'POST' });
+  showToast("✅ Contact Approve हो गया!", "success");
+  loadPending();
+  loadContacts();
+}
+
+async function deleteContact(id) {
+  if (!confirm("क्या आप sure हैं?")) return;
+  await fetch(`/api/admin/contact-delete/${id}`, { method:'DELETE' });
+  showToast("🗑️ Contact Delete हो गया!", "error");
+  loadContacts();
+  if (currentUser.role === 'admin') loadPending();
+}
+
+// Modal
+function openModal() {
+  document.getElementById("modalOverlay").classList.add("open");
+}
+function closeModal() {
+  document.getElementById("modalOverlay").classList.remove("open");
+  clearForm();
+}
+function clearForm() {
+  ['mState','mDistrict','mPS','mName','mDesig','mBatch','mMobile'].forEach(id => document.getElementById(id).value = '');
+  document.getElementById("editId").value = '';
+  document.getElementById("modalTitle").textContent = "📝 Contact Add करो";
+  document.getElementById("submitBtn").textContent = "💾 Save करो";
+}
+
+// Edit Contact
+function editContact(id, name, desig, batch, mobile, state, district, ps) {
+  document.getElementById("editId").value = id;
+  document.getElementById("mState").value = state;
+  document.getElementById("mDistrict").value = district;
+  document.getElementById("mPS").value = ps;
+  document.getElementById("mName").value = name;
+  document.getElementById("mDesig").value = desig;
+  document.getElementById("mBatch").value = batch;
+  document.getElementById("mMobile").value = mobile;
+  document.getElementById("modalTitle").textContent = "✏️ Contact Edit करो";
+  document.getElementById("submitBtn").textContent = "💾 Update करो";
+  openModal();
+}
+
+async function submitRequest() {
+  const editId = document.getElementById("editId").value;
+  const data = {
+    state: document.getElementById("mState").value.trim(),
+    district: document.getElementById("mDistrict").value.trim(),
+    policeStation: document.getElementById("mPS").value.trim(),
+    name: document.getElementById("mName").value.trim(),
+    designation: document.getElementById("mDesig").value.trim(),
+    batchNumber: document.getElementById("mBatch").value.trim(),
+    mobile: document.getElementById("mMobile").value.trim()
+  };
+
+  if (!data.state || !data.district || !data.policeStation || !data.name || !data.designation || !data.mobile) {
+    showToast("❌ सभी fields भरो!", "error");
+    return;
+  }
+  if (data.mobile.length !== 10) {
+    showToast("❌ Mobile number 10 digit का होना चाहिए!", "error");
+    return;
+  }
+
+  let res;
+  if (editId) {
+    // Edit mode
+    res = await fetch(`/api/admin/contact-edit/${editId}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data)
+    });
+  } else {
+    // Add mode - admin directly approve होता है
+    data.status = "approved";
+    res = await fetch('/api/contacts/request', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data)
+    });
+  }
+
+  const result = await res.json();
+  if (result.success) {
+    showToast(editId ? "✅ Contact Update हो गया!" : "✅ Contact Add हो गया!", "success");
+    closeModal();
+    loadContacts();
+    loadPending();
+  }
+}
+
+// Tabs
+function switchTab(tab) {
+  document.getElementById("contactsSection").style.display = tab === 'contacts' ? 'block' : 'none';
+  document.getElementById("pendingSection").style.display = tab === 'pending' ? 'block' : 'none';
+  document.getElementById("tab-contacts").classList.toggle('active', tab === 'contacts');
+  document.getElementById("tab-pending").classList.toggle('active', tab === 'pending');
+}
+
+// Toast
+function showToast(msg, type = "success") {
+  const t = document.getElementById("toast");
+  t.textContent = msg;
+  t.className = `toast ${type} show`;
+  setTimeout(() => t.className = 'toast', 3000);
+}
+// State → District → PS Data
+const locationData = {
+  "Madhya Pradesh": {
+    "Indore": ["Vijay Nagar PS", "Palasia PS", "Lasudia PS", "MIG PS", "Banganga PS", "Aerodrome PS", "Annapurna PS", "Tukoganj PS", "Sanyogitaganj PS", "Rajendra Nagar PS", "Kanadiya PS", "Limbodi PS", "Bhawarkua PS", "Juni Indore PS", "Pardeshipura PS"],
+    "Bhopal": ["Kotwali PS", "TT Nagar PS", "Habibganj PS", "Misrod PS", "Kolar PS", "Bairagarh PS", "Govindpura PS", "Hanumanganj PS", "Shahpura PS", "Bairasia PS", "Berasia PS", "Phanda PS"],
+    "Gwalior": ["City Kotwali PS", "Lashkar PS", "Morar PS", "Thatipur PS", "Hazira PS", "Padav PS", "Gola Ka Mandir PS", "Janakganj PS", "Dabra PS", "Bhitarwar PS"],
+    "Jabalpur": ["Kotwali PS", "Gorakhpur PS", "Adhartal PS", "Civil Lines PS", "Vijay Nagar PS", "Napier Town PS", "Omti PS", "Madhotal PS", "Sihora PS", "Patan PS"],
+    "Ujjain": ["Mahakal PS", "Madhavnagar PS", "Nanakheda PS", "Chimanganj PS", "Neelganga PS", "Mahidpur PS", "Nagda PS", "Khachrod PS"],
+    "Rewa": ["Kotwali PS", "Civil Lines PS", "Rewa Dehat PS", "Gurh PS", "Mauganj PS", "Hanumana PS", "Sirmour PS"],
+    "Sagar": ["City Kotwali PS", "Civil Lines PS", "Makronia PS", "Banda PS", "Rehli PS", "Khurai PS", "Rahatgarh PS"],
+    "Satna": ["Kotwali PS", "Civil Lines PS", "Birsinghpur PS", "Maihar PS", "Nagod PS", "Rampur Baghelan PS"],
+    "Dewas": ["Kotwali PS", "Civil Lines PS", "Sonkatch PS", "Kannod PS", "Khategaon PS"],
+    "Ratlam": ["Kotwali PS", "Civil Lines PS", "Sailana PS", "Jaora PS", "Alote PS"],
+    "Mandsaur": ["Kotwali PS", "Civil Lines PS", "Sitamau PS", "Malhargarh PS", "Garoth PS"],
+    "Neemuch": ["Kotwali PS", "Civil Lines PS", "Manasa PS", "Jawad PS"],
+    "Shajapur": ["Kotwali PS", "Civil Lines PS", "Shujalpur PS", "Agar PS", "Nalkheda PS"],
+    "Rajgarh": ["Kotwali PS", "Civil Lines PS", "Narsinghgarh PS", "Biaora PS", "Khilchipur PS"],
+    "Vidisha": ["Kotwali PS", "Civil Lines PS", "Sironj PS", "Basoda PS", "Ganj Basoda PS"],
+    "Raisen": ["Kotwali PS", "Civil Lines PS", "Obaidullaganj PS", "Begumganj PS", "Silwani PS"],
+    "Sehore": ["Kotwali PS", "Civil Lines PS", "Ashta PS", "Budhni PS", "Ichhawar PS"],
+    "Hoshangabad": ["Kotwali PS", "Civil Lines PS", "Itarsi PS", "Pipariya PS", "Sohagpur PS"],
+    "Betul": ["Kotwali PS", "Civil Lines PS", "Multai PS", "Amla PS", "Shahpur PS"],
+    "Chhindwara": ["Kotwali PS", "Civil Lines PS", "Sausar PS", "Pandhurna PS", "Amarwara PS"],
+    "Seoni": ["Kotwali PS", "Civil Lines PS", "Lakhnadon PS", "Barghat PS", "Keolari PS"],
+    "Mandla": ["Kotwali PS", "Civil Lines PS", "Nainpur PS", "Bichhia PS", "Mawai PS"],
+    "Balaghat": ["Kotwali PS", "Civil Lines PS", "Waraseoni PS", "Katangi PS", "Baihar PS"],
+    "Narsinghpur": ["Kotwali PS", "Civil Lines PS", "Gadarwara PS", "Gotegaon PS", "Kareli PS"],
+    "Damoh": ["Kotwali PS", "Civil Lines PS", "Patera PS", "Hatta PS", "Jabera PS"],
+    "Panna": ["Kotwali PS", "Civil Lines PS", "Pawai PS", "Ajaygarh PS", "Shahnagar PS"],
+    "Chhatarpur": ["Kotwali PS", "Civil Lines PS", "Nowgong PS", "Bijawar PS", "Harpalpur PS"],
+    "Tikamgarh": ["Kotwali PS", "Civil Lines PS", "Niwari PS", "Jatara PS", "Prithvipur PS"],
+    "Datia": ["Kotwali PS", "Civil Lines PS", "Indergarh PS", "Bhander PS"],
+    "Bhind": ["Kotwali PS", "Civil Lines PS", "Lahar PS", "Mehgaon PS", "Gohad PS"],
+    "Morena": ["Kotwali PS", "Civil Lines PS", "Ambah PS", "Porsa PS", "Kailaras PS"],
+    "Sheopur": ["Kotwali PS", "Civil Lines PS", "Vijaypur PS", "Karahal PS"],
+    "Shivpuri": ["Kotwali PS", "Civil Lines PS", "Pichhore PS", "Kolaras PS", "Karera PS"],
+    "Guna": ["Kotwali PS", "Civil Lines PS", "Raghogarh PS", "Chachoda PS", "Bamori PS"],
+    "Ashoknagar": ["Kotwali PS", "Civil Lines PS", "Chanderi PS", "Mungaoli PS"],
+    "Dhar": ["Kotwali PS", "Civil Lines PS", "Manawar PS", "Kukshi PS", "Sardarpur PS"],
+    "Jhabua": ["Kotwali PS", "Civil Lines PS", "Thandla PS", "Ranapur PS", "Petlawad PS"],
+    "Alirajpur": ["Kotwali PS", "Civil Lines PS", "Jobat PS", "Katthiwada PS"],
+    "Barwani": ["Kotwali PS", "Civil Lines PS", "Sendhwa PS", "Pati PS", "Anjad PS"],
+    "Khargone": ["Kotwali PS", "Civil Lines PS", "Bhikangaon PS", "Barwaha PS", "Kasrawad PS"],
+    "Khandwa": ["Kotwali PS", "Civil Lines PS", "Harsud PS", "Punasa PS", "Khalwa PS"],
+    "Burhanpur": ["Kotwali PS", "Civil Lines PS", "Nepanagar PS", "Shahpur PS"],
+    "Harda": ["Kotwali PS", "Civil Lines PS", "Timarni PS", "Khirkiya PS"],
+    "Shahdol": ["Kotwali PS", "Civil Lines PS", "Jaisinghnagar PS", "Beohari PS"],
+    "Umaria": ["Kotwali PS", "Civil Lines PS", "Bandhavargarh PS", "Chandia PS"],
+    "Anuppur": ["Kotwali PS", "Civil Lines PS", "Kotma PS", "Pushparajgarh PS"],
+    "Dindori": ["Kotwali PS", "Civil Lines PS", "Shahpura PS", "Bajag PS"],
+    "Katni": ["Kotwali PS", "Civil Lines PS", "Vijayraghavgarh PS", "Murwara PS", "Bahoriband PS"],
+    "Singrauli": ["Kotwali PS", "Civil Lines PS", "Waidhan PS", "Chitrangi PS"],
+    "Sidhi": ["Kotwali PS", "Civil Lines PS", "Rampur Naikin PS", "Churhat PS"],
+    "Niwari": ["Kotwali PS", "Civil Lines PS", "Prithvipur PS", "Orchha PS"]
+  }
+};
+init();
+</script>
+</body>
+</html>

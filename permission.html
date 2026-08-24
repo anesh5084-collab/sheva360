@@ -1,0 +1,610 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Seva360 – Event Permission</title>
+  <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;600;700&family=Noto+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet"/>
+  <style>
+    :root {
+      --navy:#08111f;--navy2:#0d1e36;--navy3:#112240;--accent:#e8b84b;--gold2:#f5d06a;
+      --red:#e74c3c;--green:#27ae60;--teal:#1abc9c;--text:#cdd8f0;--muted:#5e7299;
+      --card:rgba(13,30,54,0.9);--border:rgba(232,184,75,0.15);
+    }
+    *{box-sizing:border-box;margin:0;padding:0;}
+    body{font-family:'Noto Sans',sans-serif;background:var(--navy);color:var(--text);min-height:100vh;
+      background-image:radial-gradient(ellipse at 5% 15%,rgba(26,58,110,0.6) 0%,transparent 50%),radial-gradient(ellipse at 95% 85%,rgba(232,184,75,0.05) 0%,transparent 50%);}
+    .topbar{display:flex;align-items:center;justify-content:space-between;padding:13px 26px;
+      background:rgba(8,17,31,0.97);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:200;backdrop-filter:blur(14px);}
+    .tl{display:flex;align-items:center;gap:13px;}
+    .back-btn{width:34px;height:34px;border-radius:8px;background:rgba(255,255,255,0.05);border:1px solid var(--border);
+      color:var(--muted);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:14px;transition:all .2s;}
+    .back-btn:hover{color:var(--accent);border-color:var(--accent);}
+    .logo{width:38px;height:38px;border-radius:50%;background:linear-gradient(135deg,var(--accent),#b8860b);
+      display:flex;align-items:center;justify-content:center;font-family:'Rajdhani',sans-serif;font-weight:700;font-size:13px;color:var(--navy);}
+    .app-name{font-family:'Rajdhani',sans-serif;font-size:21px;font-weight:700;color:var(--accent);letter-spacing:1px;}
+    .page-sub{font-size:11px;color:var(--muted);letter-spacing:2px;text-transform:uppercase;}
+    .tr-bar{display:flex;align-items:center;gap:14px;}
+    .role-chip{padding:4px 13px;border-radius:20px;font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;}
+    .rc-admin{background:rgba(232,184,75,.18);color:var(--accent);border:1px solid var(--accent);}
+    .rc-sho{background:rgba(26,188,156,.18);color:var(--teal);border:1px solid var(--teal);}
+    .rc-hcm{background:rgba(52,152,219,.18);color:#5dade2;border:1px solid #5dade2;}
+    .rc-user{background:rgba(180,180,180,.12);color:#aaa;border:1px solid #555;}
+    .role-select{background:var(--navy3);border:1px solid var(--border);color:var(--text);padding:6px 12px;border-radius:7px;font-size:12px;outline:none;cursor:pointer;}
+    .main{max-width:1300px;margin:0 auto;padding:26px 20px;}
+    .stats{display:grid;grid-template-columns:repeat(5,1fr);gap:14px;margin-bottom:26px;}
+    .sc{background:var(--card);border:1px solid var(--border);border-radius:13px;padding:18px 20px;
+      position:relative;overflow:hidden;cursor:pointer;transition:transform .2s,box-shadow .2s;}
+    .sc:hover{transform:translateY(-3px);box-shadow:0 8px 30px rgba(0,0,0,.4);}
+    .sc::after{content:'';position:absolute;top:0;left:0;right:0;height:3px;border-radius:13px 13px 0 0;}
+    .sc.s1::after{background:var(--teal);}.sc.s2::after{background:var(--accent);}
+    .sc.s3::after{background:#5dade2;}.sc.s4::after{background:var(--red);}.sc.s5::after{background:var(--green);}
+    .sc-ico{font-size:26px;margin-bottom:9px;}
+    .sc.s1 .sc-ico{color:var(--teal);}.sc.s2 .sc-ico{color:var(--accent);}
+    .sc.s3 .sc-ico{color:#5dade2;}.sc.s4 .sc-ico{color:var(--red);}.sc.s5 .sc-ico{color:var(--green);}
+    .sc-num{font-family:'Rajdhani',sans-serif;font-size:34px;font-weight:700;line-height:1;}
+    .sc-lbl{font-size:11px;color:var(--muted);margin-top:4px;letter-spacing:.8px;text-transform:uppercase;}
+    .tabs{display:flex;gap:6px;margin-bottom:20px;flex-wrap:wrap;}
+    .tab{padding:8px 20px;border-radius:8px;border:1px solid var(--border);background:transparent;
+      color:var(--muted);font-size:13px;font-weight:600;cursor:pointer;transition:all .2s;}
+    .tab.active{background:var(--accent);color:var(--navy);border-color:var(--accent);}
+    .tab:hover:not(.active){color:var(--text);border-color:rgba(232,184,75,.4);}
+    .toolbar{display:flex;gap:11px;margin-bottom:18px;flex-wrap:wrap;align-items:center;}
+    .sbox{flex:1;min-width:220px;display:flex;align-items:center;gap:9px;
+      background:var(--card);border:1px solid var(--border);border-radius:8px;padding:8px 13px;}
+    .sbox input{background:none;border:none;outline:none;color:var(--text);font-size:13px;width:100%;}
+    .sbox i{color:var(--muted);}
+    .fsel{background:var(--card);border:1px solid var(--border);border-radius:8px;color:var(--text);padding:8px 13px;font-size:13px;outline:none;cursor:pointer;}
+    .btn{padding:8px 18px;border-radius:8px;border:none;cursor:pointer;font-size:13px;font-weight:600;
+      display:flex;align-items:center;gap:7px;transition:all .2s;white-space:nowrap;}
+    .btn-gold{background:var(--accent);color:var(--navy);}.btn-gold:hover{background:var(--gold2);}
+    .btn-out{background:transparent;border:1px solid var(--border);color:var(--text);}
+    .btn-out:hover{border-color:var(--accent);color:var(--accent);}
+    .twrap{background:var(--card);border:1px solid var(--border);border-radius:14px;overflow:hidden;}
+    table{width:100%;border-collapse:collapse;}
+    thead tr{background:rgba(232,184,75,.07);}
+    th{padding:12px 15px;text-align:left;font-size:10px;font-weight:700;letter-spacing:1.6px;text-transform:uppercase;color:var(--accent);border-bottom:1px solid var(--border);}
+    td{padding:12px 15px;font-size:13px;border-bottom:1px solid rgba(255,255,255,.035);vertical-align:middle;}
+    tr:last-child td{border-bottom:none;}
+    tr:hover td{background:rgba(232,184,75,.03);}
+    .etype{display:inline-flex;align-items:center;gap:5px;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:700;letter-spacing:.5px;}
+    .et-dharna{background:rgba(231,76,60,.18);color:#e74c3c;border:1px solid #c0392b;}
+    .et-jaloos{background:rgba(52,152,219,.18);color:#5dade2;border:1px solid #2980b9;}
+    .et-virodh{background:rgba(142,68,173,.18);color:#bb8fce;border:1px solid #8e44ad;}
+    .et-rally{background:rgba(232,184,75,.18);color:var(--accent);border:1px solid #b8860b;}
+    .et-dharm{background:rgba(26,188,156,.18);color:var(--teal);border:1px solid #16a085;}
+    .et-other{background:rgba(127,140,141,.18);color:#aaa;border:1px solid #555;}
+    .sbadge{display:inline-block;padding:3px 10px;border-radius:20px;font-size:10px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;}
+    .sb-approved{background:rgba(39,174,96,.2);color:#2ecc71;border:1px solid #27ae60;}
+    .sb-pending{background:rgba(231,76,60,.2);color:#e74c3c;border:1px solid #c0392b;}
+    .sb-upcoming{background:rgba(232,184,75,.2);color:var(--accent);border:1px solid #b8860b;}
+    .sb-today{background:rgba(26,188,156,.2);color:var(--teal);border:1px solid #16a085;}
+    .sb-rejected{background:rgba(127,140,141,.2);color:#aaa;border:1px solid #555;}
+    .sb-completed{background:rgba(100,100,100,.15);color:#666;border:1px solid #444;}
+    .act{display:flex;gap:7px;}
+    .ibtn{width:30px;height:30px;border-radius:7px;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:12px;transition:all .2s;}
+    .ib-view{background:rgba(155,89,182,.2);color:#bb8fce;}.ib-edit{background:rgba(52,152,219,.2);color:#5dade2;}
+    .ib-ok{background:rgba(39,174,96,.2);color:#2ecc71;}.ib-no{background:rgba(231,76,60,.2);color:#e74c3c;}
+    .ib-del{background:rgba(231,76,60,.15);color:#e74c3c;}.ibtn:hover{filter:brightness(1.5);}
+    .empty{text-align:center;padding:56px 20px;color:var(--muted);}
+    .empty i{font-size:44px;margin-bottom:14px;opacity:.25;display:block;}
+    .moverlay{display:none;position:fixed;inset:0;background:rgba(4,10,20,.88);backdrop-filter:blur(7px);z-index:999;align-items:center;justify-content:center;padding:16px;}
+    .moverlay.show{display:flex;}
+    .modal{background:var(--navy2);border:1px solid var(--border);border-radius:18px;padding:30px;width:100%;max-width:600px;max-height:92vh;overflow-y:auto;animation:mIn .22s ease;}
+    @keyframes mIn{from{transform:translateY(18px);opacity:0}to{transform:none;opacity:1}}
+    .mhdr{display:flex;justify-content:space-between;align-items:center;margin-bottom:22px;}
+    .mtitle{font-family:'Rajdhani',sans-serif;font-size:20px;font-weight:700;color:var(--accent);}
+    .mclose{background:none;border:none;color:var(--muted);font-size:19px;cursor:pointer;padding:4px;}
+    .mclose:hover{color:var(--text);}
+    .fg{margin-bottom:16px;}
+    .fl{display:block;font-size:11px;font-weight:700;color:var(--muted);letter-spacing:1.2px;text-transform:uppercase;margin-bottom:7px;}
+    .fc{width:100%;background:rgba(255,255,255,.05);border:1px solid var(--border);border-radius:8px;
+      color:var(--text);padding:9px 13px;font-size:13px;outline:none;transition:border-color .2s;font-family:'Noto Sans',sans-serif;}
+    .fc:focus{border-color:var(--accent);}
+    select.fc option{background:var(--navy2);}
+    textarea.fc{resize:vertical;}
+    .frow{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+    .mftr{display:flex;justify-content:flex-end;gap:10px;margin-top:24px;}
+    .req-notice{background:rgba(232,184,75,.08);border:1px solid rgba(232,184,75,.25);border-radius:9px;
+      padding:11px 15px;margin-bottom:16px;font-size:12px;color:var(--accent);display:flex;align-items:flex-start;gap:9px;line-height:1.5;}
+    .sec-div{font-size:10px;font-weight:700;color:var(--accent);letter-spacing:2px;text-transform:uppercase;
+      padding:10px 0 6px;border-bottom:1px solid var(--border);margin-bottom:14px;}
+    .vgrid{display:grid;gap:14px;}
+    .vrow2{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+    .vf label{font-size:11px;color:var(--muted);letter-spacing:1px;text-transform:uppercase;}
+    .vf .val{margin-top:5px;font-size:14px;font-weight:500;}
+    .vf .val.big{font-size:18px;font-family:'Rajdhani',sans-serif;font-weight:700;color:var(--accent);}
+    .toast{position:fixed;bottom:24px;right:24px;background:var(--navy2);border:1px solid var(--border);
+      border-radius:10px;padding:13px 18px;display:flex;align-items:center;gap:11px;font-size:13px;
+      transform:translateY(70px);opacity:0;transition:all .3s;z-index:9999;max-width:320px;}
+    .toast.show{transform:none;opacity:1;}
+    .toast.ok{border-color:var(--green);}.toast.ok .ti{color:var(--green);}
+    .toast.warn{border-color:var(--accent);}.toast.warn .ti{color:var(--accent);}
+    @media(max-width:900px){.stats{grid-template-columns:repeat(3,1fr);}th:nth-child(5),td:nth-child(5),th:nth-child(7),td:nth-child(7){display:none;}}
+    @media(max-width:600px){.stats{grid-template-columns:repeat(2,1fr);}.frow{grid-template-columns:1fr;}}
+  </style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="tl">
+    <button class="back-btn" onclick="history.back()"><i class="fas fa-arrow-left"></i></button>
+    <div class="logo">S360</div>
+    <div>
+      <div class="app-name">SEVA360</div>
+      <div class="page-sub">Event Permission Management</div>
+    </div>
+  </div>
+  <div class="tr-bar">
+    <span class="role-chip rc-admin" id="roleChip">ADMIN</span>
+    <select class="role-select" onchange="switchRole(this.value)">
+      <option value="admin">Admin</option>
+      <option value="sho">SHO</option>
+      <option value="hcm">HCM</option>
+      <option value="user">User / Organizer</option>
+    </select>
+  </div>
+</div>
+
+<div class="main">
+  <div class="stats">
+    <div class="sc s1" onclick="setTab('today',document.querySelector('[data-tab=today]'))">
+      <div class="sc-ico"><i class="fas fa-calendar-day"></i></div>
+      <div class="sc-num" id="st1">0</div>
+      <div class="sc-lbl">Aaj Ke Events</div>
+    </div>
+    <div class="sc s2" onclick="setTab('upcoming',document.querySelector('[data-tab=upcoming]'))">
+      <div class="sc-ico"><i class="fas fa-calendar-week"></i></div>
+      <div class="sc-num" id="st2">0</div>
+      <div class="sc-lbl">Upcoming Events</div>
+    </div>
+    <div class="sc s3">
+      <div class="sc-ico"><i class="fas fa-layer-group"></i></div>
+      <div class="sc-num" id="st3">0</div>
+      <div class="sc-lbl">Total Permissions</div>
+    </div>
+    <div class="sc s4" onclick="setTab('pending',document.querySelector('[data-tab=pending]'))">
+      <div class="sc-ico"><i class="fas fa-hourglass-half"></i></div>
+      <div class="sc-num" id="st4">0</div>
+      <div class="sc-lbl">Pending Requests</div>
+    </div>
+    <div class="sc s5" onclick="setTab('approved',document.querySelector('[data-tab=approved]'))">
+      <div class="sc-ico"><i class="fas fa-check-circle"></i></div>
+      <div class="sc-num" id="st5">0</div>
+      <div class="sc-lbl">Approved</div>
+    </div>
+  </div>
+
+  <div class="tabs">
+    <button class="tab"        data-tab="all"      onclick="setTab('all',this)">Sabhi Records</button>
+    <button class="tab active" data-tab="today"    onclick="setTab('today',this)">Aaj</button>
+    <button class="tab"        data-tab="upcoming" onclick="setTab('upcoming',this)">Upcoming</button>
+    <button class="tab"        data-tab="pending"  onclick="setTab('pending',this)">Pending Requests</button>
+    <button class="tab"        data-tab="approved" onclick="setTab('approved',this)">Approved</button>
+  </div>
+
+  <div class="toolbar">
+    <div class="sbox">
+      <i class="fas fa-search"></i>
+      <input type="text" id="searchInp" placeholder="Event naam, type, adhyaksh naam khojein…" oninput="render()"/>
+    </div>
+    <select class="fsel" id="typeFilter" onchange="render()">
+      <option value="">Sabhi Type</option>
+      <option value="dharna">Dharna</option>
+      <option value="jaloos">Jaloos / Juloos</option>
+      <option value="virodh">Virodh Pradarshan</option>
+      <option value="rally">Rally / Sammelan</option>
+      <option value="dharm">Dharmik Juloos</option>
+      <option value="other">Anya (Other)</option>
+    </select>
+    <button class="btn btn-gold" onclick="openAdd()">
+      <i class="fas fa-plus"></i>
+      <span id="addLbl">Nayi Permission Add Karein</span>
+    </button>
+  </div>
+
+  <div class="twrap">
+    <table>
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Event Ka Naam &amp; Jagah</th>
+          <th>Event Type</th>
+          <th>Adhyaksh / Organizer</th>
+          <th>Mobile</th>
+          <th>Date &amp; Time</th>
+          <th>Status</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody id="tbody"></tbody>
+    </table>
+    <div class="empty" id="emptyMsg" style="display:none">
+      <i class="fas fa-folder-open"></i>
+      Is filter mein koi record nahi mila.
+    </div>
+  </div>
+</div>
+
+<!-- ADD / EDIT MODAL -->
+<div class="moverlay" id="addModal">
+  <div class="modal">
+    <div class="mhdr">
+      <div class="mtitle" id="mTitle">Nayi Permission Add Karein</div>
+      <button class="mclose" onclick="closeM('addModal')"><i class="fas fa-times"></i></button>
+    </div>
+    <div class="req-notice" id="reqNotice" style="display:none">
+      <i class="fas fa-info-circle" style="margin-top:2px;flex-shrink:0"></i>
+      <span>Aapki request SHO / Admin ke paas approval ke liye bhej di jayegi. Permission milne ke baad hi event ho sakta hai.</span>
+    </div>
+    <div class="sec-div"><i class="fas fa-calendar-alt" style="margin-right:6px"></i>Event Ki Jaankari</div>
+    <div class="fg">
+      <label class="fl">Event Ka Naam *</label>
+      <input type="text" class="fc" id="fName" placeholder="Jaise: Kisan Adhikar Rally, Mazdoor Dharna…"/>
+    </div>
+    <div class="frow">
+      <div class="fg">
+        <label class="fl">Event Type *</label>
+        <select class="fc" id="fType">
+          <option value="">-- Select Karein --</option>
+          <option value="dharna">🔴 Dharna</option>
+          <option value="jaloos">🔵 Jaloos / Juloos</option>
+          <option value="virodh">🟣 Virodh Pradarshan</option>
+          <option value="rally">🟡 Rally / Sammelan</option>
+          <option value="dharm">🟢 Dharmik Juloos</option>
+          <option value="other">⚪ Anya (Other)</option>
+        </select>
+      </div>
+      <div class="fg">
+        <label class="fl">Sthan (Jagah) *</label>
+        <input type="text" class="fc" id="fPlace" placeholder="Event kahan hoga…"/>
+      </div>
+    </div>
+    <div class="frow">
+      <div class="fg">
+        <label class="fl">Event Date *</label>
+        <input type="date" class="fc" id="fDate"/>
+      </div>
+      <div class="fg">
+        <label class="fl">Event Time</label>
+        <input type="time" class="fc" id="fTime"/>
+      </div>
+    </div>
+    <div class="fg">
+      <label class="fl">Route (Jaloos ke liye)</label>
+      <input type="text" class="fc" id="fRoute" placeholder="Kahan se kahan tak jayega…"/>
+    </div>
+    <div class="fg">
+      <label class="fl">Anumaanik Pratinaagi Sankhya (Log)</label>
+      <input type="number" class="fc" id="fCount" placeholder="Kitne log aayenge…" min="1"/>
+    </div>
+    <div class="fg">
+      <label class="fl">Event Ki Puri Jaankari / Uddeshya *</label>
+      <textarea class="fc" id="fDetail" rows="3" placeholder="Event ka uddeshya, demands, ya koi khaas baat…"></textarea>
+    </div>
+    <div class="sec-div" style="margin-top:4px"><i class="fas fa-user-tie" style="margin-right:6px"></i>Adhyaksh / Mukhya Aayojak</div>
+    <div class="frow">
+      <div class="fg">
+        <label class="fl">Adhyaksh Ka Naam *</label>
+        <input type="text" class="fc" id="fOrgName" placeholder="Poora naam…"/>
+      </div>
+      <div class="fg">
+        <label class="fl">Mobile Number *</label>
+        <input type="tel" class="fc" id="fMobile" placeholder="10 digit…" maxlength="10"/>
+      </div>
+    </div>
+    <div class="frow">
+      <div class="fg">
+        <label class="fl">Sangathan / Party</label>
+        <input type="text" class="fc" id="fOrg" placeholder="Sangathan ya party naam…"/>
+      </div>
+      <div class="fg">
+        <label class="fl">Pata / Address</label>
+        <input type="text" class="fc" id="fAddress" placeholder="Adhyaksh ka pata…"/>
+      </div>
+    </div>
+    <div class="fg" id="statusFG">
+      <label class="fl">Status</label>
+      <select class="fc" id="fStatus">
+        <option value="approved">Approved ✔</option>
+        <option value="pending">Pending ⏳</option>
+        <option value="upcoming">Upcoming 📅</option>
+        <option value="rejected">Rejected ✖</option>
+      </select>
+    </div>
+    <div class="mftr">
+      <button class="btn btn-out" onclick="closeM('addModal')">Raddh Karein</button>
+      <button class="btn btn-gold" onclick="submitForm()" id="submitBtn">
+        <i class="fas fa-save"></i> Surakshit Karein
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- VIEW MODAL -->
+<div class="moverlay" id="viewModal">
+  <div class="modal" style="max-width:560px">
+    <div class="mhdr">
+      <div class="mtitle">Permission Vivran</div>
+      <button class="mclose" onclick="closeM('viewModal')"><i class="fas fa-times"></i></button>
+    </div>
+    <div id="viewContent"></div>
+    <div class="mftr">
+      <button class="btn btn-out" onclick="closeM('viewModal')">Band Karein</button>
+      <button class="btn btn-gold" onclick="printRecord()"><i class="fas fa-print"></i> Print</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast">
+  <span class="ti" id="ti" style="font-size:17px"></span>
+  <span id="tmsg"></span>
+</div>
+
+<script>
+const today = new Date().toISOString().split('T')[0];
+function fd(n){const d=new Date();d.setDate(d.getDate()+n);return d.toISOString().split('T')[0];}
+function pd(n){const d=new Date();d.setDate(d.getDate()-n);return d.toISOString().split('T')[0];}
+
+let data = [
+  {id:1,name:'Kisan Adhikar Dharna',type:'dharna',place:'Collector Karyalay Chowk',date:today,time:'10:00',route:'Gandhi Chowk se Collector tak',count:200,orgName:'Ramesh Kumar Yadav',mobile:'9876543210',org:'Kisan Sangharsh Samiti',address:'Village Rampur',detail:'MSP guarantee ki maang, sarkar se baat karne ki apeel',status:'approved'},
+  {id:2,name:'Mazdoor Ekta Jaloos',type:'jaloos',place:'Town Hall se Tehsil Chowk',date:today,time:'14:00',route:'Town Hall → Market → Tehsil',count:350,orgName:'Suresh Mishra',mobile:'9812345678',org:'AITUC',address:'23 Labour Colony',detail:'Nyuntam vetan vriddhi, thekedar system band ki maang',status:'approved'},
+  {id:3,name:'Yuva Virodh Pradarshan',type:'virodh',place:'SP Office ke Samne',date:fd(2),time:'11:00',route:'',count:80,orgName:'Priya Sharma',mobile:'8765432109',org:'NSUI',address:'College Road',detail:'Scholarship bandh karne ke khilaf pradarshan',status:'upcoming'},
+  {id:4,name:'BJP Kisan Sammelan',type:'rally',place:'Ramlila Maidan',date:fd(4),time:'15:00',route:'',count:1500,orgName:'Vijay Singh Patel',mobile:'9988776655',org:'BJP Kisan Morcha',address:'BJP Office City Center',detail:'Kisan samman nidhi jaankari aur naye yojana udghaatan',status:'upcoming'},
+  {id:5,name:'Eid-ul-Fitr Juloos',type:'dharm',place:'Jama Masjid se Idgah Maidan',date:fd(6),time:'09:00',route:'Jama Masjid → Main Road → Idgah',count:2000,orgName:'Maulana Abdul Rehman',mobile:'9765432100',org:'Muslim Welfare Society',address:'Mohalla Qazipura',detail:'Paramparagat dharmik juloos, shantipurna',status:'upcoming'},
+  {id:6,name:'Paryavaran Bachao Rally',type:'rally',place:'City Park',date:fd(1),time:'08:00',route:'',count:120,orgName:'Kavita Verma',mobile:'8899001122',org:'Green Earth NGO',address:'Sector 5',detail:'Ped katai ke khilaf jagrukta rally',status:'pending'},
+  {id:7,name:'SC/ST Adhikar March',type:'jaloos',place:'Ambedkar Chowk to DM Office',date:pd(3),time:'10:00',route:'Ambedkar Chowk → DM Office',count:400,orgName:'Deepak Rawat',mobile:'9123456780',org:'BSP',address:'Scheduled Colony',detail:'Atrocity mamlon mein karvai ki maang',status:'approved'},
+];
+let nextId=8,viewRec=null,editing=null,role='admin';
+
+const typeMap={
+  dharna:{label:'Dharna',cls:'et-dharna',icon:'fa-fist-raised'},
+  jaloos:{label:'Jaloos',cls:'et-jaloos',icon:'fa-people-carry'},
+  virodh:{label:'Virodh Pradarshan',cls:'et-virodh',icon:'fa-bullhorn'},
+  rally:{label:'Rally/Sammelan',cls:'et-rally',icon:'fa-flag'},
+  dharm:{label:'Dharmik Juloos',cls:'et-dharm',icon:'fa-place-of-worship'},
+  other:{label:'Anya',cls:'et-other',icon:'fa-circle-dot'},
+};
+
+function typeBadge(t){const m=typeMap[t]||typeMap.other;return`<span class="etype ${m.cls}"><i class="fas ${m.icon}"></i>${m.label}</span>`;}
+
+function statusBadge(r){
+  if(r.status==='pending')  return`<span class="sbadge sb-pending">Pending</span>`;
+  if(r.status==='rejected') return`<span class="sbadge sb-rejected">Rejected</span>`;
+  if(r.status==='approved'&&r.date<today) return`<span class="sbadge sb-completed">Completed</span>`;
+  if(r.date===today) return`<span class="sbadge sb-today">Aaj</span>`;
+  if(r.date>today)   return`<span class="sbadge sb-upcoming">Upcoming</span>`;
+  return`<span class="sbadge sb-approved">Approved</span>`;
+}
+
+function fmtDate(d){if(!d)return'—';return new Date(d+'T00:00:00').toLocaleDateString('hi-IN',{day:'2-digit',month:'short',year:'numeric'});}
+
+function switchRole(r){
+  role=r;
+  const chip=document.getElementById('roleChip');
+  chip.className='role-chip rc-'+r;
+  chip.textContent=r.toUpperCase();
+  document.getElementById('addLbl').textContent=(r==='hcm'||r==='user')?'Permission Request Bhejein':'Nayi Permission Add Karein';
+  render();updateStats();
+}
+
+function updateStats(){
+  document.getElementById('st1').textContent=data.filter(r=>r.date===today).length;
+  document.getElementById('st2').textContent=data.filter(r=>r.date>today).length;
+  document.getElementById('st3').textContent=data.length;
+  document.getElementById('st4').textContent=data.filter(r=>r.status==='pending').length;
+  document.getElementById('st5').textContent=data.filter(r=>r.status==='approved').length;
+}
+
+let curTab='today';
+function setTab(t,el){
+  curTab=t;
+  document.querySelectorAll('.tab').forEach(b=>b.classList.remove('active'));
+  if(el)el.classList.add('active');
+  render();
+}
+
+function filtered(){
+  const q=document.getElementById('searchInp').value.toLowerCase();
+  const tp=document.getElementById('typeFilter').value;
+  return data.filter(r=>{
+    if(curTab==='today'&&r.date!==today)return false;
+    if(curTab==='upcoming'&&r.date<=today)return false;
+    if(curTab==='pending'&&r.status!=='pending')return false;
+    if(curTab==='approved'&&r.status!=='approved')return false;
+    if(tp&&r.type!==tp)return false;
+    if(q&&!r.name.toLowerCase().includes(q)&&!r.orgName.toLowerCase().includes(q)&&!r.place.toLowerCase().includes(q))return false;
+    return true;
+  });
+}
+
+function render(){
+  const list=filtered();
+  const tbody=document.getElementById('tbody');
+  const emp=document.getElementById('emptyMsg');
+  if(!list.length){tbody.innerHTML='';emp.style.display='block';return;}
+  emp.style.display='none';
+  const canEdit=role==='admin'||role==='sho';
+  tbody.innerHTML=list.map((r,i)=>`
+    <tr>
+      <td style="color:var(--muted);font-size:12px">${i+1}</td>
+      <td>
+        <div style="font-weight:600">${r.name}</div>
+        <div style="font-size:11px;color:var(--muted);margin-top:2px"><i class="fas fa-map-marker-alt" style="margin-right:4px;color:var(--red)"></i>${r.place}</div>
+      </td>
+      <td>${typeBadge(r.type)}</td>
+      <td>
+        <div style="font-weight:600">${r.orgName}</div>
+        <div style="font-size:11px;color:var(--muted)">${r.org||'—'}</div>
+      </td>
+      <td><a href="tel:${r.mobile}" style="color:var(--teal);text-decoration:none"><i class="fas fa-phone" style="font-size:10px;margin-right:4px"></i>${r.mobile}</a></td>
+      <td>
+        <div>${fmtDate(r.date)}</div>
+        <div style="font-size:11px;color:var(--muted)">${r.time||'—'}</div>
+      </td>
+      <td>${statusBadge(r)}</td>
+      <td><div class="act">
+        <button class="ibtn ib-view" title="Vivran" onclick="viewRecord(${r.id})"><i class="fas fa-eye"></i></button>
+        ${canEdit?`
+        <button class="ibtn ib-edit" title="Edit" onclick="editRecord(${r.id})"><i class="fas fa-pen"></i></button>
+        ${r.status==='pending'?`
+        <button class="ibtn ib-ok" title="Approve" onclick="chStatus(${r.id},'approved')"><i class="fas fa-check"></i></button>
+        <button class="ibtn ib-no" title="Reject" onclick="chStatus(${r.id},'rejected')"><i class="fas fa-times"></i></button>
+        `:''}
+        <button class="ibtn ib-del" title="Delete" onclick="delRecord(${r.id})"><i class="fas fa-trash"></i></button>
+        `:''}
+      </div></td>
+    </tr>`).join('');
+}
+
+function chStatus(id,st){
+  const r=data.find(x=>x.id===id);if(!r)return;
+  r.status=st;render();updateStats();
+  toast(st==='approved'?'ok':'warn',st==='approved'?'✔ Permission approve kar di gayi':'✖ Permission reject kar di gayi');
+}
+function delRecord(id){
+  if(!confirm('Kya aap is record ko delete karna chahte hain?'))return;
+  data=data.filter(x=>x.id!==id);render();updateStats();toast('warn','Record delete kar diya gaya');
+}
+
+function viewRecord(id){
+  const r=data.find(x=>x.id===id);if(!r)return;viewRec=r;
+  document.getElementById('viewContent').innerHTML=`
+    <div class="vgrid">
+      <div class="vf"><label>Event Ka Naam</label><div class="val big">${r.name}</div></div>
+      <div class="vrow2">
+        <div class="vf"><label>Event Type</label><div class="val" style="margin-top:7px">${typeBadge(r.type)}</div></div>
+        <div class="vf"><label>Status</label><div class="val" style="margin-top:7px">${statusBadge(r)}</div></div>
+      </div>
+      <div class="vrow2">
+        <div class="vf"><label>Date</label><div class="val">${fmtDate(r.date)}</div></div>
+        <div class="vf"><label>Time</label><div class="val">${r.time||'—'}</div></div>
+      </div>
+      <div class="vf"><label>Sthan</label><div class="val">${r.place}</div></div>
+      ${r.route?`<div class="vf"><label>Route</label><div class="val">${r.route}</div></div>`:''}
+      <div class="vf"><label>Anumaanik Log</label><div class="val">${r.count?r.count+' log':'—'}</div></div>
+      <div style="border-top:1px solid var(--border);padding-top:14px;margin-top:4px">
+        <div style="font-size:10px;color:var(--accent);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:12px;font-weight:700">Adhyaksh Vivran</div>
+        <div class="vrow2">
+          <div class="vf"><label>Naam</label><div class="val" style="font-weight:700">${r.orgName}</div></div>
+          <div class="vf"><label>Mobile</label><div class="val"><a href="tel:${r.mobile}" style="color:var(--teal);text-decoration:none">${r.mobile}</a></div></div>
+        </div>
+        <div class="vrow2" style="margin-top:10px">
+          <div class="vf"><label>Sangathan</label><div class="val">${r.org||'—'}</div></div>
+          <div class="vf"><label>Pata</label><div class="val">${r.address||'—'}</div></div>
+        </div>
+      </div>
+      <div class="vf"><label>Event Vivran / Uddeshya</label>
+        <div class="val" style="line-height:1.7;background:rgba(255,255,255,.03);padding:10px 13px;border-radius:8px;border:1px solid var(--border);margin-top:7px">${r.detail}</div>
+      </div>
+    </div>`;
+  document.getElementById('viewModal').classList.add('show');
+}
+
+function printRecord(){
+  if(!viewRec)return;const r=viewRec;
+  const w=window.open('','_blank');
+  w.document.write(`<html><head><title>Permission – ${r.name}</title>
+  <style>body{font-family:Arial,sans-serif;padding:30px;color:#111}h2{color:#1a3a6e;border-bottom:2px solid #e8b84b;padding-bottom:8px}table{width:100%;border-collapse:collapse;margin-top:16px}td{padding:9px 12px;border:1px solid #ddd;font-size:13px}td:first-child{font-weight:700;background:#f9f9f9;width:200px}.hdr{text-align:center;margin-bottom:24px}</style></head>
+  <body><div class="hdr"><h2>SEVA360 – Event Permission</h2><p style="color:#888;font-size:12px">Printed: ${new Date().toLocaleString('hi-IN')}</p></div>
+  <table>
+  <tr><td>Event Ka Naam</td><td>${r.name}</td></tr>
+  <tr><td>Event Type</td><td>${(typeMap[r.type]||typeMap.other).label}</td></tr>
+  <tr><td>Date &amp; Time</td><td>${fmtDate(r.date)} ${r.time||''}</td></tr>
+  <tr><td>Sthan</td><td>${r.place}</td></tr>
+  <tr><td>Route</td><td>${r.route||'—'}</td></tr>
+  <tr><td>Log Sankhya</td><td>${r.count||'—'}</td></tr>
+  <tr><td>Adhyaksh Naam</td><td>${r.orgName}</td></tr>
+  <tr><td>Mobile</td><td>${r.mobile}</td></tr>
+  <tr><td>Sangathan</td><td>${r.org||'—'}</td></tr>
+  <tr><td>Pata</td><td>${r.address||'—'}</td></tr>
+  <tr><td>Status</td><td>${r.status.toUpperCase()}</td></tr>
+  <tr><td>Event Vivran</td><td>${r.detail}</td></tr>
+  </table>
+  <p style="margin-top:50px;font-size:12px;color:#aaa;text-align:right">SEVA360 – Police Station Management System</p>
+  </body></html>`);
+  w.document.close();w.print();
+}
+
+function openAdd(){
+  editing=null;
+  ['fName','fPlace','fRoute','fOrgName','fMobile','fOrg','fAddress','fDetail'].forEach(i=>document.getElementById(i).value='');
+  document.getElementById('fCount').value='';
+  document.getElementById('fType').value='';
+  document.getElementById('fDate').value=today;
+  document.getElementById('fTime').value='';
+  document.getElementById('fStatus').value='approved';
+  const isReqRole=(role==='hcm'||role==='user');
+  document.getElementById('mTitle').textContent=isReqRole?'Permission Request Bhejein':'Nayi Permission Add Karein';
+  document.getElementById('submitBtn').innerHTML=isReqRole?'<i class="fas fa-paper-plane"></i> Request Bhejein':'<i class="fas fa-save"></i> Surakshit Karein';
+  document.getElementById('reqNotice').style.display=isReqRole?'flex':'none';
+  document.getElementById('statusFG').style.display=isReqRole?'none':'block';
+  document.getElementById('addModal').classList.add('show');
+}
+
+function editRecord(id){
+  const r=data.find(x=>x.id===id);if(!r)return;editing=id;
+  document.getElementById('fName').value=r.name;
+  document.getElementById('fType').value=r.type;
+  document.getElementById('fPlace').value=r.place;
+  document.getElementById('fDate').value=r.date;
+  document.getElementById('fTime').value=r.time;
+  document.getElementById('fRoute').value=r.route||'';
+  document.getElementById('fCount').value=r.count||'';
+  document.getElementById('fOrgName').value=r.orgName;
+  document.getElementById('fMobile').value=r.mobile;
+  document.getElementById('fOrg').value=r.org||'';
+  document.getElementById('fAddress').value=r.address||'';
+  document.getElementById('fDetail').value=r.detail;
+  document.getElementById('fStatus').value=r.status;
+  document.getElementById('mTitle').textContent='Record Edit Karein';
+  document.getElementById('submitBtn').innerHTML='<i class="fas fa-save"></i> Update Karein';
+  document.getElementById('reqNotice').style.display='none';
+  document.getElementById('statusFG').style.display='block';
+  document.getElementById('addModal').classList.add('show');
+}
+
+function closeM(id){document.getElementById(id).classList.remove('show');}
+
+function submitForm(){
+  const name=document.getElementById('fName').value.trim();
+  const type=document.getElementById('fType').value;
+  const date=document.getElementById('fDate').value;
+  const place=document.getElementById('fPlace').value.trim();
+  const orgName=document.getElementById('fOrgName').value.trim();
+  const mobile=document.getElementById('fMobile').value.trim();
+  const detail=document.getElementById('fDetail').value.trim();
+  if(!name||!type||!date||!place||!orgName||!mobile||!detail){toast('warn','⚠ Sabhi * wale fields bharna zaroori hai');return;}
+  if(!/^\d{10}$/.test(mobile)){toast('warn','Mobile number 10 digit ka hona chahiye');return;}
+  const isReq=(role==='hcm'||role==='user')&&!editing;
+  const rec={
+    id:editing||nextId++,name,type,place,
+    date,time:document.getElementById('fTime').value,
+    route:document.getElementById('fRoute').value.trim(),
+    count:parseInt(document.getElementById('fCount').value)||0,
+    orgName,mobile,
+    org:document.getElementById('fOrg').value.trim(),
+    address:document.getElementById('fAddress').value.trim(),
+    detail,
+    status:isReq?'pending':document.getElementById('fStatus').value,
+  };
+  if(editing){data=data.map(x=>x.id===editing?rec:x);toast('ok','✔ Record update ho gaya');}
+  else{data.push(rec);toast('ok',isReq?'📨 Request bhej di gayi, approval ka intezaar karein':'✔ Nayi permission add ho gayi');}
+  closeM('addModal');render();updateStats();
+}
+
+function toast(type,msg){
+  const t=document.getElementById('toast');
+  t.className='toast '+type;
+  document.getElementById('ti').textContent=type==='ok'?'✔':'⚠';
+  document.getElementById('tmsg').textContent=msg;
+  t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),3500);
+}
+
+document.querySelectorAll('.moverlay').forEach(o=>o.addEventListener('click',e=>{if(e.target===o)o.classList.remove('show');}));
+updateStats();render();
+</script>
+</body>
+</html>

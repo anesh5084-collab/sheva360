@@ -1,0 +1,239 @@
+allowedForMap: {
+    type: Boolean,
+    default: false
+}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Seva360 – User Dashboard</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <!-- Leaflet Map -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #f4f6f9;
+    }
+
+    /* 🔵 TOP BAR */
+    .topbar {
+      background: #0b5ed7;
+      color: white;
+      padding: 12px 20px;
+      font-size: 18px;
+      font-weight: bold;
+      text-align: center;
+    }
+
+    /* 🗺 MAP */
+    #map {
+      height: calc(100vh - 140px);
+      width: 100%;
+    }
+
+    /* 🔽 BOTTOM PANEL */
+    .bottom-panel {
+      height: 80px;
+      background: white;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0 20px;
+      box-shadow: 0 -2px 5px rgba(0,0,0,0.2);
+    }
+
+    .status {
+      font-size: 14px;
+      color: green;
+    }
+
+    .arrow-btn {
+      background: #0b5ed7;
+      color: white;
+      border: none;
+      border-radius: 50%;
+      width: 50px;
+      height: 50px;
+      font-size: 22px;
+      cursor: pointer;
+    }
+  </style>
+  <div style="
+  background:white;
+  padding:10px;
+  text-align:center;
+  font-size:14px;
+  box-shadow:0 2px 5px rgba(0,0,0,0.1)">
+  
+  <div id="userName">Loading name...</div>
+  <div id="userPhone" style="color:gray;"></div>
+
+</div>
+
+</head>
+<script src="/socket.io/socket.io.js"></script>
+
+<script>
+const socket = io();
+
+// ⚠️ location support check
+if ("geolocation" in navigator) {
+
+  navigator.geolocation.watchPosition(
+    (position) => {
+      const data = {
+        lat: position.coords.latitude,
+        lng: position.coords.longitude
+      };
+
+      console.log("📍 Sending location:", data);
+
+      socket.emit("userLocation", data);
+    },
+    (error) => {
+      console.warn("❌ Location error:", error.message);
+      // ❗ app band nahi hoga
+    },
+    {
+      enableHighAccuracy: true,
+      maximumAge: 0,
+      timeout: 5000
+    }
+  );
+
+} else {
+  console.log("❌ Geolocation not supported");
+}
+</script>
+<script>
+if ("geolocation" in navigator) {
+    navigator.geolocation.watchPosition(position => {
+        fetch("/user/update-location", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                lat: position.coords.latitude,
+                lng: position.coords.longitude,
+                place: "Live Location"
+            })
+        });
+    }, err => {
+        console.log("Location denied but app running");
+    });
+}
+</script>
+
+<body>
+<script>
+let watchId = null;
+
+function startLiveLocation() {
+  if (!navigator.geolocation) {
+    console.log("Geolocation supported nahi hai");
+    return;
+  }
+
+  watchId = navigator.geolocation.watchPosition(
+    (position) => {
+      const lat = position.coords.latitude;
+      const lng = position.coords.longitude;
+
+      fetch("/user/update-location", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ lat, lng })
+      });
+    },
+    (error) => {
+      console.log("Location band hai");
+      document.getElementById("locationMsg").innerText =
+        "⚠ Location OFF hai, app fir bhi chal rahi hai";
+    },
+    {
+      enableHighAccuracy: true,
+      timeout: 10000
+    }
+  );
+}
+
+startLiveLocation();
+</script>
+
+<div id="locationMsg" style="color:red;"></div>
+
+  <!-- 🔵 HEADER -->
+  <div class="topbar">
+    📍 Seva360 – User Live Location
+  </div>
+
+  <!-- 🗺 MAP -->
+  <div id="map"></div>
+
+  <!-- 🔽 BOTTOM -->
+  <div class="bottom-panel">
+    <div class="status" id="statusText">
+      🔄 Waiting for location permission...
+    </div>
+    <button class="arrow-btn">➤</button>
+  </div>
+
+  <!-- Leaflet JS -->
+  <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+
+  <script>
+    const map = L.map("map").setView([23.2599, 77.4126], 13); // Bhopal
+
+    L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+      attribution: "© OpenStreetMap"
+    }).addTo(map);
+
+    let marker;
+
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          const lat = position.coords.latitude;
+          const lng = position.coords.longitude;
+
+          document.getElementById("statusText").innerText =
+            "✅ Location Active";
+
+          marker = L.marker([lat, lng]).addTo(map)
+            .bindPopup("📍 Your Location")
+            .openPopup();
+
+          map.setView([lat, lng], 16);
+        },
+        () => {
+          document.getElementById("statusText").innerText =
+            "⚠ Location OFF – App still working";
+        }
+      );
+    }
+  </script>
+<script>
+fetch("/user/profile")
+  .then(res => res.json())
+  .then(data => {
+    document.getElementById("userName").innerText =
+      "👤 " + (data.fullName || "User");
+
+    document.getElementById("userPhone").innerText =
+      "📞 " + (data.phone || "Not available");
+  })
+  .catch(() => {
+    document.getElementById("userName").innerText =
+      "👤 User";
+  });
+</script>
+
+</body>
+</html>

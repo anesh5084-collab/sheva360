@@ -1,0 +1,792 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Seva360 – Officer List</title>
+  <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;600;700&family=Noto+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet"/>
+  <style>
+    :root{
+      --navy:#07101e; --navy2:#0c1c33; --navy3:#102040;
+      --accent:#e8b84b; --gold2:#f5d06a;
+      --red:#e74c3c; --green:#27ae60; --teal:#1abc9c;
+      --blue:#2980b9; --purple:#8e44ad; --orange:#e67e22;
+      --text:#cdd8f0; --muted:#5a6e96;
+      --card:rgba(12,28,51,0.92); --border:rgba(232,184,75,0.14);
+    }
+    *{box-sizing:border-box;margin:0;padding:0;}
+    body{font-family:'Noto Sans',sans-serif;background:var(--navy);color:var(--text);min-height:100vh;
+      background-image:
+        radial-gradient(ellipse at 8% 10%,rgba(26,58,110,0.55) 0%,transparent 55%),
+        radial-gradient(ellipse at 92% 90%,rgba(232,184,75,0.06) 0%,transparent 50%);}
+
+    /* TOPBAR */
+    .topbar{display:flex;align-items:center;justify-content:space-between;padding:12px 24px;
+      background:rgba(7,16,30,0.97);border-bottom:1px solid var(--border);
+      position:sticky;top:0;z-index:300;backdrop-filter:blur(16px);}
+    .tl{display:flex;align-items:center;gap:12px;}
+    .back-btn{width:33px;height:33px;border-radius:8px;background:rgba(255,255,255,.05);
+      border:1px solid var(--border);color:var(--muted);cursor:pointer;
+      display:flex;align-items:center;justify-content:center;font-size:13px;transition:all .2s;}
+    .back-btn:hover{color:var(--accent);border-color:var(--accent);}
+    .logo{width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,var(--accent),#b8860b);
+      display:flex;align-items:center;justify-content:center;
+      font-family:'Rajdhani',sans-serif;font-weight:700;font-size:12px;color:var(--navy);}
+    .app-name{font-family:'Rajdhani',sans-serif;font-size:20px;font-weight:700;color:var(--accent);letter-spacing:1px;}
+    .page-sub{font-size:10px;color:var(--muted);letter-spacing:2px;text-transform:uppercase;}
+    .tr-bar{display:flex;align-items:center;gap:12px;}
+    .role-chip{padding:3px 12px;border-radius:20px;font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;}
+    .rc-admin{background:rgba(232,184,75,.18);color:var(--accent);border:1px solid var(--accent);}
+    .rc-sho  {background:rgba(26,188,156,.18);color:var(--teal);border:1px solid var(--teal);}
+    .rc-hcm  {background:rgba(52,152,219,.18);color:#5dade2;border:1px solid #5dade2;}
+    .rc-user {background:rgba(180,180,180,.12);color:#aaa;border:1px solid #555;}
+    .rsel{background:var(--navy3);border:1px solid var(--border);color:var(--text);
+      padding:5px 11px;border-radius:7px;font-size:12px;outline:none;cursor:pointer;}
+
+    /* MAIN */
+    .main{max-width:1300px;margin:0 auto;padding:22px 18px;}
+
+    /* STATS */
+    .stats{display:grid;grid-template-columns:repeat(7,1fr);gap:10px;margin-bottom:22px;}
+    .sc{background:var(--card);border:1px solid var(--border);border-radius:11px;padding:13px 14px;
+      position:relative;overflow:hidden;cursor:pointer;transition:transform .2s,box-shadow .2s;}
+    .sc:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(0,0,0,.4);}
+    .sc::after{content:'';position:absolute;top:0;left:0;right:0;height:3px;border-radius:11px 11px 0 0;}
+    .sc.s0::after{background:#aaa;}
+    .sc.s1::after{background:var(--green);}   .sc.s2::after{background:var(--teal);}
+    .sc.s3::after{background:var(--red);}     .sc.s4::after{background:var(--blue);}
+    .sc.s5::after{background:var(--orange);}  .sc.s6::after{background:var(--purple);}
+    .sc-ico{font-size:18px;margin-bottom:6px;}
+    .sc.s0 .sc-ico{color:#aaa;}
+    .sc.s1 .sc-ico{color:var(--green);}  .sc.s2 .sc-ico{color:var(--teal);}
+    .sc.s3 .sc-ico{color:var(--red);}    .sc.s4 .sc-ico{color:var(--blue);}
+    .sc.s5 .sc-ico{color:var(--orange);} .sc.s6 .sc-ico{color:var(--purple);}
+    .sc-num{font-family:'Rajdhani',sans-serif;font-size:26px;font-weight:700;line-height:1;}
+    .sc-lbl{font-size:9px;color:var(--muted);margin-top:3px;letter-spacing:.7px;text-transform:uppercase;}
+
+    /* TOOLBAR */
+    .toolbar{display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap;align-items:center;}
+    .sbox{flex:1;min-width:200px;display:flex;align-items:center;gap:8px;
+      background:var(--card);border:1px solid var(--border);border-radius:8px;padding:8px 12px;}
+    .sbox input{background:none;border:none;outline:none;color:var(--text);font-size:13px;width:100%;}
+    .sbox i{color:var(--muted);}
+    .fsel{background:var(--card);border:1px solid var(--border);border-radius:8px;
+      color:var(--text);padding:8px 12px;font-size:13px;outline:none;cursor:pointer;}
+    .btn{padding:8px 16px;border-radius:8px;border:none;cursor:pointer;font-size:13px;font-weight:600;
+      display:flex;align-items:center;gap:6px;transition:all .2s;white-space:nowrap;}
+    .btn-gold{background:var(--accent);color:var(--navy);}
+    .btn-gold:hover{background:var(--gold2);}
+    .btn-out{background:transparent;border:1px solid var(--border);color:var(--text);}
+    .btn-out:hover{border-color:var(--accent);color:var(--accent);}
+
+    /* TABLE */
+    .twrap{background:var(--card);border:1px solid var(--border);border-radius:14px;overflow:hidden;}
+    table{width:100%;border-collapse:collapse;}
+    thead tr{background:rgba(232,184,75,.07);}
+    th{padding:11px 14px;text-align:left;font-size:10px;font-weight:700;letter-spacing:1.5px;
+      text-transform:uppercase;color:var(--accent);border-bottom:1px solid var(--border);}
+    td{padding:11px 14px;font-size:13px;border-bottom:1px solid rgba(255,255,255,.035);vertical-align:middle;}
+    tr:last-child td{border-bottom:none;}
+    tr:hover td{background:rgba(232,184,75,.025);}
+
+    /* rank badge */
+    .rb{display:inline-block;padding:2px 9px;border-radius:12px;font-size:10px;font-weight:700;letter-spacing:.4px;}
+    .rk-ti {background:rgba(232,184,75,.2);color:var(--accent);border:1px solid rgba(232,184,75,.4);}
+    .rk-si {background:rgba(52,152,219,.2);color:#5dade2;border:1px solid rgba(52,152,219,.4);}
+    .rk-asi{background:rgba(142,68,173,.2);color:#bb8fce;border:1px solid rgba(142,68,173,.4);}
+    .rk-hc {background:rgba(26,188,156,.2);color:var(--teal);border:1px solid rgba(26,188,156,.4);}
+    .rk-con{background:rgba(100,100,100,.2);color:#aaa;border:1px solid rgba(100,100,100,.4);}
+
+    /* status pill — big clickable */
+    .status-pill{
+      display:inline-flex;align-items:center;gap:6px;
+      padding:5px 12px;border-radius:20px;font-size:11px;font-weight:700;
+      cursor:pointer;transition:all .2s;border:1px solid transparent;
+      letter-spacing:.4px;
+    }
+    .status-pill:hover{filter:brightness(1.2);transform:scale(1.04);}
+    .sp-active  {background:rgba(39,174,96,.18);  color:#2ecc71; border-color:rgba(39,174,96,.4);}
+    .sp-leave   {background:rgba(231,76,60,.18);  color:#e74c3c; border-color:rgba(231,76,60,.4);}
+    .sp-outside {background:rgba(41,128,185,.18); color:#5dade2; border-color:rgba(41,128,185,.4);}
+    .sp-computer{background:rgba(26,188,156,.18); color:var(--teal);border-color:rgba(26,188,156,.4);}
+    .sp-absent  {background:rgba(231,76,60,.18);  color:#e74c3c; border-color:rgba(231,76,60,.5);}
+    .sp-chhoot  {background:rgba(142,68,173,.18); color:#bb8fce; border-color:rgba(142,68,173,.4);}
+    .sp-crime   {background:rgba(232,184,75,.18); color:var(--accent);border-color:rgba(232,184,75,.4);}
+
+    /* duty toggle */
+    .duty-toggle{
+      display:inline-flex;align-items:center;gap:6px;
+      padding:4px 11px;border-radius:14px;font-size:11px;font-weight:700;
+      cursor:pointer;border:1px solid;transition:all .2s;
+    }
+    .dt-on {background:rgba(39,174,96,.15);color:#2ecc71;border-color:rgba(39,174,96,.4);}
+    .dt-off{background:rgba(231,76,60,.12);color:#e74c3c;border-color:rgba(231,76,60,.35);}
+    .dt-on:hover,.dt-off:hover{filter:brightness(1.3);}
+
+    .ibtn{width:28px;height:28px;border-radius:7px;border:none;cursor:pointer;
+      display:flex;align-items:center;justify-content:center;font-size:11px;transition:all .2s;}
+    .ib-edit{background:rgba(52,152,219,.2);color:#5dade2;}
+    .ib-del {background:rgba(231,76,60,.15);color:#e74c3c;}
+    .ibtn:hover{filter:brightness(1.5);}
+    .act{display:flex;gap:6px;align-items:center;}
+
+    /* note text */
+    .note-text{font-size:11px;color:var(--muted);max-width:160px;overflow:hidden;
+      text-overflow:ellipsis;white-space:nowrap;}
+
+    /* MODAL */
+    .moverlay{display:none;position:fixed;inset:0;background:rgba(3,8,18,.9);
+      backdrop-filter:blur(8px);z-index:999;align-items:center;justify-content:center;padding:14px;}
+    .moverlay.show{display:flex;}
+    .modal{background:var(--navy2);border:1px solid var(--border);border-radius:18px;
+      padding:26px;width:100%;max-width:520px;max-height:90vh;overflow-y:auto;animation:mIn .22s ease;}
+    @keyframes mIn{from{transform:translateY(16px);opacity:0}to{transform:none;opacity:1}}
+    .mhdr{display:flex;justify-content:space-between;align-items:center;margin-bottom:18px;}
+    .mtitle{font-family:'Rajdhani',sans-serif;font-size:19px;font-weight:700;color:var(--accent);}
+    .mclose{background:none;border:none;color:var(--muted);font-size:18px;cursor:pointer;}
+    .mclose:hover{color:var(--text);}
+    .fg{margin-bottom:14px;}
+    .fl{display:block;font-size:10px;font-weight:700;color:var(--muted);letter-spacing:1.2px;
+      text-transform:uppercase;margin-bottom:6px;}
+    .fc{width:100%;background:rgba(255,255,255,.05);border:1px solid var(--border);
+      border-radius:8px;color:var(--text);padding:8px 12px;font-size:13px;outline:none;
+      transition:border-color .2s;font-family:'Noto Sans',sans-serif;}
+    .fc:focus{border-color:var(--accent);}
+    select.fc option{background:var(--navy2);}
+    textarea.fc{resize:vertical;}
+    .frow{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+    .mftr{display:flex;justify-content:flex-end;gap:10px;margin-top:20px;}
+    .sec-div{font-size:10px;font-weight:700;color:var(--accent);letter-spacing:2px;
+      text-transform:uppercase;padding:8px 0 5px;border-bottom:1px solid var(--border);margin-bottom:12px;}
+
+    /* STATUS PICKER GRID */
+    .status-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:4px;}
+    .sg-item{
+      padding:10px 8px;border-radius:10px;border:2px solid transparent;
+      cursor:pointer;text-align:center;transition:all .2s;
+      background:rgba(255,255,255,.04);
+    }
+    .sg-item:hover{background:rgba(255,255,255,.08);}
+    .sg-item.selected{border-color:var(--accent);background:rgba(232,184,75,.1);}
+    .sg-item i{font-size:18px;display:block;margin-bottom:5px;}
+    .sg-item .sg-lbl{font-size:11px;font-weight:700;}
+    .sg-item .sg-sub{font-size:9px;color:var(--muted);margin-top:2px;}
+
+    /* DUTY FLAG */
+    .duty-flag-row{display:flex;align-items:center;justify-content:space-between;
+      background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:10px;padding:12px 14px;}
+    .toggle-sw{position:relative;width:44px;height:24px;cursor:pointer;}
+    .toggle-sw input{opacity:0;width:0;height:0;position:absolute;}
+    .toggle-track{position:absolute;inset:0;background:#2a2a2a;border-radius:24px;transition:.3s;}
+    .toggle-track::after{content:'';position:absolute;left:3px;top:3px;width:18px;height:18px;
+      background:white;border-radius:50%;transition:.3s;}
+    input:checked + .toggle-track{background:var(--green);}
+    input:checked + .toggle-track::after{transform:translateX(20px);}
+
+    /* TOAST */
+    .toast{position:fixed;bottom:22px;right:22px;background:var(--navy2);border:1px solid var(--border);
+      border-radius:10px;padding:11px 16px;display:flex;align-items:center;gap:10px;font-size:13px;
+      transform:translateY(60px);opacity:0;transition:all .3s;z-index:9999;max-width:300px;}
+    .toast.show{transform:none;opacity:1;}
+    .toast.ok  {border-color:var(--green);} .toast.ok   .ti{color:var(--green);}
+    .toast.warn{border-color:var(--accent);}.toast.warn .ti{color:var(--accent);}
+    .toast.err {border-color:var(--red);}   .toast.err  .ti{color:var(--red);}
+
+    /* empty */
+    .empty{text-align:center;padding:50px;color:var(--muted);}
+    .empty i{font-size:40px;opacity:.2;display:block;margin-bottom:12px;}
+
+    @media(max-width:1100px){.stats{grid-template-columns:repeat(4,1fr);}}
+    @media(max-width:700px){
+      .stats{grid-template-columns:repeat(3,1fr);}
+      .frow{grid-template-columns:1fr;}
+      th:nth-child(5),td:nth-child(5){display:none;}
+    }
+  </style>
+</head>
+<body>
+
+<!-- TOPBAR -->
+<div class="topbar">
+  <div class="tl">
+    <button class="back-btn" onclick="history.back()"><i class="fas fa-arrow-left"></i></button>
+    <div class="logo">S360</div>
+    <div>
+      <div class="app-name">SEVA360</div>
+      <div class="page-sub">Officer Roster &amp; Status</div>
+    </div>
+  </div>
+  <div class="tr-bar">
+    <span class="role-chip rc-admin" id="roleChip">ADMIN</span>
+    <select class="rsel" onchange="switchRole(this.value)">
+      <option value="admin">Admin</option>
+      <option value="sho">SHO</option>
+      <option value="hcm">HCM</option>
+      <option value="user">User</option>
+    </select>
+  </div>
+</div>
+
+<div class="main">
+
+  <!-- STATS -->
+  <div class="stats">
+    <div class="sc s0" onclick="setFilter('all',this)">
+      <div class="sc-ico"><i class="fas fa-users"></i></div>
+      <div class="sc-num" id="ct-all">0</div>
+      <div class="sc-lbl">Kul Officers</div>
+    </div>
+    <div class="sc s1" onclick="setFilter('active',this)">
+      <div class="sc-ico"><i class="fas fa-user-check"></i></div>
+      <div class="sc-num" id="ct-active">0</div>
+      <div class="sc-lbl">Duty Yogya</div>
+    </div>
+    <div class="sc s2" onclick="setFilter('computer',this)">
+      <div class="sc-ico"><i class="fas fa-desktop"></i></div>
+      <div class="sc-num" id="ct-computer">0</div>
+      <div class="sc-lbl">Computer/Fix</div>
+    </div>
+    <div class="sc s3" onclick="setFilter('leave',this)">
+      <div class="sc-ico"><i class="fas fa-umbrella-beach"></i></div>
+      <div class="sc-num" id="ct-leave">0</div>
+      <div class="sc-lbl">Leave Par</div>
+    </div>
+    <div class="sc s4" onclick="setFilter('outside',this)">
+      <div class="sc-ico"><i class="fas fa-map-marker-alt"></i></div>
+      <div class="sc-num" id="ct-outside">0</div>
+      <div class="sc-lbl">Jilay Bahar</div>
+    </div>
+    <div class="sc s5" onclick="setFilter('absent',this)">
+      <div class="sc-ico"><i class="fas fa-user-times"></i></div>
+      <div class="sc-num" id="ct-absent">0</div>
+      <div class="sc-lbl">Absent</div>
+    </div>
+    <div class="sc s6" onclick="setFilter('chhoot',this)">
+      <div class="sc-ico"><i class="fas fa-ban"></i></div>
+      <div class="sc-num" id="ct-chhoot">0</div>
+      <div class="sc-lbl">Duty Chhoot</div>
+    </div>
+  </div>
+
+  <!-- TOOLBAR -->
+  <div class="toolbar">
+    <div class="sbox">
+      <i class="fas fa-search"></i>
+      <input type="text" id="searchInp" placeholder="Officer naam ya rank khojein…" oninput="render()"/>
+    </div>
+    <select class="fsel" id="rankFilter" onchange="render()">
+      <option value="">Sabhi Rank</option>
+      <option value="TI">TI</option>
+      <option value="SI">SI</option>
+      <option value="Lady SI">Lady SI</option>
+      <option value="ASI">ASI</option>
+      <option value="Lady ASI">Lady ASI</option>
+      <option value="HC">Head Constable</option>
+      <option value="Lady HC">Lady HC</option>
+      <option value="Constable">Constable</option>
+      <option value="Lady Constable">Lady Constable</option>
+    </select>
+    <button class="btn btn-gold" id="addOfficerBtn" onclick="openAddOfficer()">
+      <i class="fas fa-user-plus"></i> Officer Add Karein
+    </button>
+  </div>
+
+  <!-- TABLE -->
+  <div class="twrap">
+    <table>
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Officer Ka Naam</th>
+          <th>Rank</th>
+          <th>Abhi Ki Sthiti (Status)</th>
+          <th>Note / Karan</th>
+          <th>Duty Lagegi?</th>
+          <th id="actTh">Actions</th>
+        </tr>
+      </thead>
+      <tbody id="tbody"></tbody>
+    </table>
+    <div class="empty" id="emptyMsg" style="display:none">
+      <i class="fas fa-user-slash"></i>
+      Is filter mein koi officer nahi mila.
+    </div>
+  </div>
+</div>
+
+<!-- STATUS CHANGE MODAL -->
+<div class="moverlay" id="statusModal">
+  <div class="modal">
+    <div class="mhdr">
+      <div class="mtitle">Officer Ki Sthiti Badlein</div>
+      <button class="mclose" onclick="closeM('statusModal')"><i class="fas fa-times"></i></button>
+    </div>
+
+    <!-- Officer Info Banner -->
+    <div style="background:rgba(232,184,75,.07);border:1px solid var(--border);border-radius:10px;
+      padding:12px 14px;margin-bottom:18px;display:flex;align-items:center;gap:12px;">
+      <div style="width:38px;height:38px;border-radius:50%;background:rgba(232,184,75,.15);
+        display:flex;align-items:center;justify-content:center;font-size:16px;color:var(--accent);flex-shrink:0">
+        <i class="fas fa-user-shield"></i>
+      </div>
+      <div>
+        <div style="font-weight:700;font-size:15px" id="sOfficerName">—</div>
+        <div style="font-size:11px;color:var(--muted)" id="sOfficerRank">—</div>
+      </div>
+      <input type="hidden" id="sOfficerId"/>
+    </div>
+
+    <!-- Status Picker -->
+    <div class="sec-div"><i class="fas fa-toggle-on" style="margin-right:6px"></i>Nai Sthiti Chunein</div>
+    <div class="status-grid" id="statusGrid">
+      <!-- filled by JS -->
+    </div>
+
+    <!-- Note -->
+    <div class="fg" style="margin-top:14px">
+      <label class="fl">Karan / Note <span style="font-weight:400;text-transform:none;letter-spacing:0;font-size:9px;color:var(--muted)">(Optional)</span></label>
+      <input type="text" class="fc" id="sNote" placeholder="Jaise: Sasuraal gaye, Civil Hospital admit, Vidhayak bandobast…"/>
+    </div>
+
+    <!-- Till Date (optional) -->
+    <div class="fg">
+      <label class="fl">Kab Tak? <span style="font-weight:400;text-transform:none;letter-spacing:0;font-size:9px;color:var(--muted)">(Khali = Jab tak manually badlein)</span></label>
+      <input type="date" class="fc" id="sTillDate"/>
+      <div style="font-size:10px;color:var(--muted);margin-top:4px">
+        <i class="fas fa-info-circle" style="margin-right:3px"></i>Date dene par us din ke baad status automatic "Active" ho jayega
+      </div>
+    </div>
+
+    <!-- Duty Toggle -->
+    <div class="sec-div"><i class="fas fa-clipboard-list" style="margin-right:6px"></i>Duty Lagegi?</div>
+    <div class="duty-flag-row">
+      <div>
+        <div style="font-weight:600;font-size:14px">Duty Schedule Mein Naam Aaye?</div>
+        <div style="font-size:11px;color:var(--muted);margin-top:3px">OFF karne par duty chart mein naam nahi aayega</div>
+      </div>
+      <label class="toggle-sw">
+        <input type="checkbox" id="sDutyToggle" checked/>
+        <div class="toggle-track"></div>
+      </label>
+    </div>
+
+    <div class="mftr">
+      <button class="btn btn-out" onclick="closeM('statusModal')">Raddh Karein</button>
+      <button class="btn btn-gold" onclick="saveStatus()">
+        <i class="fas fa-save"></i> Sthiti Save Karein
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ADD / EDIT OFFICER MODAL -->
+<div class="moverlay" id="officerModal">
+  <div class="modal">
+    <div class="mhdr">
+      <div class="mtitle" id="omTitle">Nayi Officer Add Karein</div>
+      <button class="mclose" onclick="closeM('officerModal')"><i class="fas fa-times"></i></button>
+    </div>
+    <div class="sec-div"><i class="fas fa-user" style="margin-right:6px"></i>Vyaktigat Jaankari</div>
+    <div class="fg">
+      <label class="fl">Poora Naam *</label>
+      <input type="text" class="fc" id="oName" placeholder="Officer ka poora naam…"/>
+    </div>
+    <div class="frow">
+      <div class="fg">
+        <label class="fl">Rank *</label>
+        <select class="fc" id="oRank">
+          <option value="">-- Rank Chunein --</option>
+          <option value="TI">TI (Thana Incharge)</option>
+          <option value="SI">SI (Sub Inspector)</option>
+          <option value="Lady SI">Lady SI</option>
+          <option value="ASI">ASI</option>
+          <option value="Lady ASI">Lady ASI</option>
+          <option value="HC">Head Constable</option>
+          <option value="Lady HC">Lady HC</option>
+          <option value="Constable">Constable</option>
+          <option value="Lady Constable">Lady Constable</option>
+        </select>
+      </div>
+      <div class="fg">
+        <label class="fl">Badge / PNo.</label>
+        <input type="text" class="fc" id="oBadge" placeholder="Police number…"/>
+      </div>
+    </div>
+    <div class="fg">
+      <label class="fl">Mobile</label>
+      <input type="tel" class="fc" id="oMobile" placeholder="10 digit mobile…" maxlength="10"/>
+    </div>
+    <div class="sec-div" style="margin-top:4px"><i class="fas fa-lock" style="margin-right:6px"></i>Fix Duty (Agar Koi)</div>
+    <div class="fg">
+      <label class="fl">Fix Zimmedari</label>
+      <select class="fc" id="oFixDuty">
+        <option value="">Koi Fix Duty Nahi</option>
+        <option value="crime_lekhan">Jayram / Crime Lekhak</option>
+        <option value="computer">Computer Operator</option>
+        <option value="muddamal">Muddamal Incharge</option>
+        <option value="thana_incharge">Thana Prabhri (TI)</option>
+        <option value="malkhana">Malkhana Incharge</option>
+        <option value="roznamcha">Roznamcha Lekhak</option>
+        <option value="wireless">Wireless Operator</option>
+      </select>
+    </div>
+    <div class="mftr">
+      <button class="btn btn-out" onclick="closeM('officerModal')">Raddh Karein</button>
+      <button class="btn btn-gold" onclick="saveOfficer()" id="omSubmit">
+        <i class="fas fa-save"></i> Save Karein
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast">
+  <span class="ti" id="ti" style="font-size:16px"></span>
+  <span id="tmsg"></span>
+</div>
+
+<script>
+// ─────────────────────────────────────────────
+//  STATUS CONFIG
+// ─────────────────────────────────────────────
+const STATUS_MAP = {
+  active:   {label:'Active / Thane Mein',  icon:'fa-user-check',    color:'var(--green)', cls:'sp-active',   pill:'✅'},
+  leave:    {label:'Leave Par',             icon:'fa-umbrella-beach',color:'#e74c3c',      cls:'sp-leave',    pill:'🏖'},
+  outside:  {label:'Jilay Ke Bahar',        icon:'fa-map-marker-alt',color:'#5dade2',      cls:'sp-outside',  pill:'🗺'},
+  computer: {label:'Computer / Fix Jagah',  icon:'fa-desktop',       color:'var(--teal)',  cls:'sp-computer', pill:'💻'},
+  absent:   {label:'Anupasthit (Absent)',   icon:'fa-user-times',    color:'#e74c3c',      cls:'sp-absent',   pill:'❌'},
+  chhoot:   {label:'Vishesh Chhoot',        icon:'fa-ban',           color:'#bb8fce',      cls:'sp-chhoot',   pill:'🚫'},
+  crime:    {label:'Crime / Anya Fix Duty', icon:'fa-file-alt',      color:'var(--accent)',cls:'sp-crime',    pill:'📋'},
+};
+
+const RANK_CSS = {
+  'TI':'rk-ti','SI':'rk-si','Lady SI':'rk-si',
+  'ASI':'rk-asi','Lady ASI':'rk-asi',
+  'HC':'rk-hc','Lady HC':'rk-hc',
+  'Constable':'rk-con','Lady Constable':'rk-con'
+};
+
+const FIX_LABELS = {
+  crime_lekhan:'Jayram/Crime Lekhak', computer:'Computer Operator',
+  muddamal:'Muddamal Incharge', thana_incharge:'Thana Prabhri',
+  malkhana:'Malkhana Incharge', roznamcha:'Roznamcha Lekhak',
+  wireless:'Wireless Operator'
+};
+
+// ─────────────────────────────────────────────
+//  DATA
+// ─────────────────────────────────────────────
+let officers = [
+  {id:1, name:'Rajesh Kumar Sharma', rank:'TI',             badge:'TI-001', mobile:'9800000001', fixDuty:'thana_incharge', status:'active',   dutyEligible:true,  note:'',           tillDate:null},
+  {id:2, name:'Suresh Yadav',        rank:'SI',             badge:'SI-012', mobile:'9800000002', fixDuty:null,            status:'active',   dutyEligible:true,  note:'',           tillDate:null},
+  {id:3, name:'Pradeep Mishra',      rank:'SI',             badge:'SI-015', mobile:'9800000003', fixDuty:null,            status:'active',   dutyEligible:true,  note:'',           tillDate:null},
+  {id:4, name:'Meena Sharma',        rank:'Lady SI',        badge:'SI-021', mobile:'9800000004', fixDuty:null,            status:'active',   dutyEligible:true,  note:'',           tillDate:null},
+  {id:5, name:'Ramkumar Tiwari',     rank:'ASI',            badge:'ASI-03', mobile:'9800000005', fixDuty:null,            status:'active',   dutyEligible:true,  note:'',           tillDate:null},
+  {id:6, name:'Dharmesh Patel',      rank:'ASI',            badge:'ASI-07', mobile:'9800000006', fixDuty:'crime_lekhan', status:'crime',    dutyEligible:false, note:'Crime lekhan fix zimmedari', tillDate:null},
+  {id:7, name:'Sunita Verma',        rank:'Lady ASI',       badge:'ASI-11', mobile:'9800000007', fixDuty:null,            status:'leave',    dutyEligible:false, note:'Maternity leave', tillDate:'2025-04-30'},
+  {id:8, name:'Mahesh Singh',        rank:'HC',             badge:'HC-022', mobile:'9800000008', fixDuty:null,            status:'active',   dutyEligible:true,  note:'',           tillDate:null},
+  {id:9, name:'Vijay Kumar',         rank:'HC',             badge:'HC-031', mobile:'9800000009', fixDuty:'computer',     status:'computer', dutyEligible:false, note:'Computer operator fix', tillDate:null},
+  {id:10,name:'Pushpa Bai',          rank:'Lady HC',        badge:'HC-041', mobile:'9800000010', fixDuty:null,            status:'active',   dutyEligible:true,  note:'',           tillDate:null},
+  {id:11,name:'Kailash Rawat',       rank:'HC',             badge:'HC-045', mobile:'9800000011', fixDuty:null,            status:'outside',  dutyEligible:false, note:'SP Office training – Bhopal', tillDate:'2025-03-20'},
+  {id:12,name:'Ramesh Constable',    rank:'Constable',      badge:'Con-101',mobile:'9800000012', fixDuty:null,            status:'active',   dutyEligible:true,  note:'',           tillDate:null},
+  {id:13,name:'Sunil Kumar',         rank:'Constable',      badge:'Con-108',mobile:'9800000013', fixDuty:null,            status:'active',   dutyEligible:true,  note:'',           tillDate:null},
+  {id:14,name:'Deepak Singh',        rank:'Constable',      badge:'Con-115',mobile:'9800000014', fixDuty:null,            status:'active',   dutyEligible:true,  note:'',           tillDate:null},
+  {id:15,name:'Anjali Rao',          rank:'Lady Constable', badge:'Con-120',mobile:'9800000015', fixDuty:null,            status:'active',   dutyEligible:true,  note:'',           tillDate:null},
+  {id:16,name:'Raju Prasad',         rank:'Constable',      badge:'Con-125',mobile:'9800000016', fixDuty:null,            status:'leave',    dutyEligible:false, note:'Casual leave',tillDate:null},
+  {id:17,name:'Mohan Lal',           rank:'Constable',      badge:'Con-130',mobile:'9800000017', fixDuty:null,            status:'active',   dutyEligible:true,  note:'',           tillDate:null},
+  {id:18,name:'Geeta Devi',          rank:'Lady Constable', badge:'Con-135',mobile:'9800000018', fixDuty:null,            status:'active',   dutyEligible:true,  note:'',           tillDate:null},
+  {id:19,name:'Arun Kumar',          rank:'Constable',      badge:'Con-140',mobile:'9800000019', fixDuty:'muddamal',     status:'crime',    dutyEligible:false, note:'Muddamal incharge', tillDate:null},
+];
+let nextId = 20;
+let role = 'admin';
+let curFilter = 'all';
+let editingId = null;
+let selectedStatus = null;
+
+// ─────────────────────────────────────────────
+//  ROLE
+// ─────────────────────────────────────────────
+function switchRole(r){
+  role = r;
+  const chip = document.getElementById('roleChip');
+  chip.className = 'role-chip rc-'+r;
+  chip.textContent = r.toUpperCase();
+  const canEdit = r==='admin'||r==='sho'||r==='hcm';
+  document.getElementById('addOfficerBtn').style.display = canEdit?'flex':'none';
+  document.getElementById('actTh').style.display = canEdit?'':'none';
+  render();
+}
+
+// ─────────────────────────────────────────────
+//  FILTER
+// ─────────────────────────────────────────────
+function setFilter(f, el){
+  curFilter = f;
+  document.querySelectorAll('.sc').forEach(s=>s.style.outline='none');
+  if(el) el.style.outline='2px solid var(--accent)';
+  render();
+}
+
+function filtered(){
+  const q  = document.getElementById('searchInp').value.toLowerCase();
+  const rk = document.getElementById('rankFilter').value;
+  return officers.filter(o=>{
+    if(curFilter!=='all' && o.status!==curFilter) return false;
+    if(rk && o.rank!==rk) return false;
+    if(q && !o.name.toLowerCase().includes(q) && !o.rank.toLowerCase().includes(q)) return false;
+    return true;
+  });
+}
+
+// ─────────────────────────────────────────────
+//  STATS
+// ─────────────────────────────────────────────
+function updateStats(){
+  const counts = {all:officers.length, active:0, computer:0, leave:0, outside:0, absent:0, chhoot:0};
+  officers.forEach(o=>{
+    if(o.status==='active')   counts.active++;
+    if(o.status==='computer'||o.status==='crime') counts.computer++;
+    if(o.status==='leave')    counts.leave++;
+    if(o.status==='outside')  counts.outside++;
+    if(o.status==='absent')   counts.absent++;
+    if(o.status==='chhoot')   counts.chhoot++;
+  });
+  Object.keys(counts).forEach(k=>{
+    const el=document.getElementById('ct-'+k);
+    if(el) el.textContent=counts[k];
+  });
+}
+
+// ─────────────────────────────────────────────
+//  RENDER TABLE
+// ─────────────────────────────────────────────
+function render(){
+  updateStats();
+  const list = filtered();
+  const tbody = document.getElementById('tbody');
+  const empty = document.getElementById('emptyMsg');
+  if(!list.length){ tbody.innerHTML=''; empty.style.display='block'; return; }
+  empty.style.display='none';
+  const canEdit = role==='admin'||role==='sho'||role==='hcm';
+
+  tbody.innerHTML = list.map((o,i)=>{
+    const st  = STATUS_MAP[o.status] || STATUS_MAP.active;
+    const rk  = RANK_CSS[o.rank]||'rk-con';
+    const fix = o.fixDuty ? FIX_LABELS[o.fixDuty]||o.fixDuty : null;
+    const till = o.tillDate ? `<div style="font-size:10px;color:var(--muted);margin-top:2px"><i class="fas fa-clock" style="margin-right:3px"></i>Tak: ${fmtDate(o.tillDate)}</div>` : '';
+
+    return `<tr>
+      <td style="color:var(--muted);font-size:12px">${i+1}</td>
+      <td>
+        <div style="font-weight:700">${o.name}</div>
+        <div style="display:flex;gap:6px;margin-top:3px;flex-wrap:wrap">
+          ${o.badge?`<span style="font-size:10px;color:var(--muted)">#${o.badge}</span>`:''}
+          ${o.mobile?`<a href="tel:${o.mobile}" style="font-size:10px;color:var(--teal);text-decoration:none"><i class="fas fa-phone" style="font-size:9px;margin-right:2px"></i>${o.mobile}</a>`:''}
+        </div>
+        ${fix?`<div style="font-size:10px;color:var(--teal);margin-top:2px"><i class="fas fa-lock" style="margin-right:3px"></i>${fix}</div>`:''}
+      </td>
+      <td><span class="rb ${rk}">${o.rank}</span></td>
+      <td>
+        ${canEdit
+          ? `<span class="status-pill ${st.cls}" onclick="openStatusModal(${o.id})" title="Click to change">
+              <i class="fas ${st.icon}"></i>${st.label}
+             </span>`
+          : `<span class="status-pill ${st.cls}" style="cursor:default">
+              <i class="fas ${st.icon}"></i>${st.label}
+             </span>`
+        }
+        ${till}
+      </td>
+      <td>
+        <div class="note-text" title="${o.note||''}">${o.note||'<span style="color:var(--muted)">—</span>'}</div>
+      </td>
+      <td>
+        ${canEdit
+          ? `<span class="duty-toggle ${o.dutyEligible?'dt-on':'dt-off'}"
+               onclick="quickToggleDuty(${o.id})" title="Duty lagegi ya nahi">
+               <i class="fas ${o.dutyEligible?'fa-check':'fa-times'}"></i>
+               ${o.dutyEligible?'Haan':'Nahi'}
+             </span>`
+          : `<span class="duty-toggle ${o.dutyEligible?'dt-on':'dt-off'}" style="cursor:default">
+               <i class="fas ${o.dutyEligible?'fa-check':'fa-times'}"></i>
+               ${o.dutyEligible?'Haan':'Nahi'}
+             </span>`
+        }
+      </td>
+      <td>
+        <div class="act">
+          ${canEdit?`
+          <button class="ibtn ib-edit" title="Status badlein" onclick="openStatusModal(${o.id})">
+            <i class="fas fa-tag"></i>
+          </button>
+          <button class="ibtn ib-edit" title="Edit officer" onclick="editOfficer(${o.id})" style="background:rgba(232,184,75,.15);color:var(--accent)">
+            <i class="fas fa-pen"></i>
+          </button>
+          <button class="ibtn ib-del" title="Delete" onclick="delOfficer(${o.id})">
+            <i class="fas fa-trash"></i>
+          </button>`
+          :`<button class="ibtn" style="background:rgba(155,89,182,.2);color:#bb8fce">
+              <i class="fas fa-eye"></i>
+            </button>`}
+        </div>
+      </td>
+    </tr>`;
+  }).join('');
+}
+
+function fmtDate(d){
+  if(!d)return'—';
+  return new Date(d+'T00:00:00').toLocaleDateString('hi-IN',{day:'2-digit',month:'short',year:'numeric'});
+}
+
+// ─────────────────────────────────────────────
+//  STATUS MODAL
+// ─────────────────────────────────────────────
+function openStatusModal(oid){
+  const o = officers.find(x=>x.id===oid); if(!o)return;
+  document.getElementById('sOfficerName').textContent = o.name;
+  document.getElementById('sOfficerRank').textContent = o.rank + (o.badge?' • #'+o.badge:'');
+  document.getElementById('sOfficerId').value = oid;
+  document.getElementById('sNote').value = o.note||'';
+  document.getElementById('sTillDate').value = o.tillDate||'';
+  document.getElementById('sDutyToggle').checked = o.dutyEligible;
+  selectedStatus = o.status;
+  buildStatusGrid(o.status);
+  document.getElementById('statusModal').classList.add('show');
+}
+
+function buildStatusGrid(current){
+  const grid = document.getElementById('statusGrid');
+  grid.innerHTML = Object.entries(STATUS_MAP).map(([key,s])=>`
+    <div class="sg-item ${key===current?'selected':''}" onclick="selectStatus('${key}',this)">
+      <i class="fas ${s.icon}" style="color:${s.color}"></i>
+      <div class="sg-lbl" style="color:${s.color}">${s.pill}</div>
+      <div class="sg-sub">${s.label}</div>
+    </div>
+  `).join('');
+}
+
+function selectStatus(key, el){
+  selectedStatus = key;
+  document.querySelectorAll('.sg-item').forEach(x=>x.classList.remove('selected'));
+  el.classList.add('selected');
+  // auto set duty toggle based on status
+  const autoOn = (key==='active');
+  const autoOff = ['leave','outside','absent','chhoot','crime','computer'].includes(key);
+  if(autoOn)  document.getElementById('sDutyToggle').checked = true;
+  if(autoOff) document.getElementById('sDutyToggle').checked = false;
+}
+
+function saveStatus(){
+  const oid = parseInt(document.getElementById('sOfficerId').value);
+  const o = officers.find(x=>x.id===oid); if(!o)return;
+  if(!selectedStatus){ toast('warn','Koi status chunein'); return; }
+  o.status       = selectedStatus;
+  o.note         = document.getElementById('sNote').value.trim();
+  o.tillDate     = document.getElementById('sTillDate').value || null;
+  o.dutyEligible = document.getElementById('sDutyToggle').checked;
+  closeM('statusModal');
+  render();
+  toast('ok', o.name + ' ki sthiti update ho gayi → ' + STATUS_MAP[selectedStatus].label);
+}
+
+// Quick duty toggle from table
+function quickToggleDuty(oid){
+  const o = officers.find(x=>x.id===oid); if(!o)return;
+  o.dutyEligible = !o.dutyEligible;
+  render();
+  toast(o.dutyEligible?'ok':'warn',
+    o.name + (o.dutyEligible?' ko duty schedule mein add kiya':'ki duty schedule se hataaya'));
+}
+
+// ─────────────────────────────────────────────
+//  ADD / EDIT OFFICER MODAL
+// ─────────────────────────────────────────────
+function openAddOfficer(){
+  editingId = null;
+  ['oName','oBadge','oMobile'].forEach(i=>document.getElementById(i).value='');
+  document.getElementById('oRank').value='';
+  document.getElementById('oFixDuty').value='';
+  document.getElementById('omTitle').textContent='Nayi Officer Add Karein';
+  document.getElementById('omSubmit').innerHTML='<i class="fas fa-user-plus"></i> Officer Add Karein';
+  document.getElementById('officerModal').classList.add('show');
+}
+
+function editOfficer(oid){
+  const o = officers.find(x=>x.id===oid); if(!o)return;
+  editingId = oid;
+  document.getElementById('oName').value    = o.name;
+  document.getElementById('oRank').value    = o.rank;
+  document.getElementById('oBadge').value   = o.badge||'';
+  document.getElementById('oMobile').value  = o.mobile||'';
+  document.getElementById('oFixDuty').value = o.fixDuty||'';
+  document.getElementById('omTitle').textContent='Officer Edit Karein';
+  document.getElementById('omSubmit').innerHTML='<i class="fas fa-save"></i> Update Karein';
+  document.getElementById('officerModal').classList.add('show');
+}
+
+function saveOfficer(){
+  const name = document.getElementById('oName').value.trim();
+  const rank = document.getElementById('oRank').value;
+  if(!name||!rank){ toast('warn','Naam aur rank zaroori hai'); return; }
+  const fix = document.getElementById('oFixDuty').value;
+  if(editingId){
+    const o = officers.find(x=>x.id===editingId);
+    o.name    = name;
+    o.rank    = rank;
+    o.badge   = document.getElementById('oBadge').value.trim();
+    o.mobile  = document.getElementById('oMobile').value.trim();
+    o.fixDuty = fix||null;
+    if(fix){ o.status='crime'; o.dutyEligible=false; }
+    toast('ok','Officer update ho gaya');
+  } else {
+    const newO = {
+      id: nextId++, name, rank,
+      badge:   document.getElementById('oBadge').value.trim(),
+      mobile:  document.getElementById('oMobile').value.trim(),
+      fixDuty: fix||null,
+      status:  fix?'crime':'active',
+      dutyEligible: !fix,
+      note:'', tillDate:null
+    };
+    officers.push(newO);
+    toast('ok', name + ' ko roster mein add kar diya');
+  }
+  closeM('officerModal');
+  render();
+}
+
+function delOfficer(oid){
+  const o = officers.find(x=>x.id===oid); if(!o)return;
+  if(!confirm(o.name+' ko roster se hataayein?'))return;
+  officers = officers.filter(x=>x.id!==oid);
+  render();
+  toast('warn', o.name + ' roster se hata diya gaya');
+}
+
+// ─────────────────────────────────────────────
+//  UTILS
+// ─────────────────────────────────────────────
+function closeM(id){ document.getElementById(id).classList.remove('show'); }
+
+function toast(type, msg){
+  const t = document.getElementById('toast');
+  t.className = 'toast '+type;
+  document.getElementById('ti').textContent = type==='ok'?'✔':type==='err'?'✖':'⚠';
+  document.getElementById('tmsg').textContent = msg;
+  t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'), 3200);
+}
+
+document.querySelectorAll('.moverlay').forEach(o=>
+  o.addEventListener('click',e=>{ if(e.target===o) o.classList.remove('show'); })
+);
+
+// ─────────────────────────────────────────────
+//  INIT
+// ─────────────────────────────────────────────
+render();
+</script>
+</body>
+</html>
